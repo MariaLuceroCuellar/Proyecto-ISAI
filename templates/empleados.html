@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Empleados - Comics POS</title>
+    <title>Empleados - Tienda de Cómics</title>
     <style>
+        /* Estilos generales */
         * {
             margin: 0;
             padding: 0;
@@ -14,13 +15,11 @@
 
         body {
             background-color: #f5f5f5;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            color: #333;
         }
 
-        /* Navbar styles */
-        .navbar {
+        /* Estilos del encabezado */
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -34,8 +33,6 @@
             font-size: 24px;
             display: flex;
             align-items: center;
-            text-decoration: none;
-            color: black;
         }
 
         .logo::before {
@@ -48,554 +45,864 @@
             clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 70%, 0 100%);
         }
 
-        .nav-links {
+        nav ul {
             display: flex;
             list-style: none;
             gap: 30px;
         }
 
-        .nav-links li a {
+        nav ul li a {
             text-decoration: none;
             color: #333;
             font-weight: 500;
-            padding: 8px 0;
-            position: relative;
         }
 
-        .nav-links li a.active {
-            color: #e32929;
-            font-weight: 600;
+        /* Contenedor principal */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
         }
 
-        .nav-links li a.active::after {
-            content: '';
-            position: absolute;
+        /* Estilos para la tabla de empleados */
+        .employees-table {
             width: 100%;
-            height: 2px;
-            bottom: 0;
-            left: 0;
-            background-color: #e32929;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            margin-top: 20px;
         }
 
-        .user-menu {
-            position: relative;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #e32929;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-
-        .user-name {
-            font-weight: 500;
-        }
-
-        .dropdown-icon {
-            margin-left: 8px;
-            font-size: 12px;
-        }
-
-        /* Main content styles */
-        .main-content {
-            flex: 1;
-            padding: 30px;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .page-title {
-            font-size: 28px;
-            margin-bottom: 20px;
+        .table-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .add-btn {
-            background-color: #e32929;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Search and filter section */
-        .filters-section {
-            background-color: white;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
         }
 
-        .search-bar {
-            display: flex;
-            margin-bottom: 15px;
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
         }
 
-        .search-input {
-            flex: 1;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px 0 0 5px;
-            font-size: 14px;
-        }
-
-        .search-btn {
-            padding: 10px 20px;
+        .add-employee-btn {
             background-color: #e32929;
             color: white;
             border: none;
-            border-radius: 0 5px 5px 0;
+            padding: 10px 15px;
+            border-radius: 5px;
             cursor: pointer;
-        }
-
-        .filter-options {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .filter-group {
+            font-weight: bold;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
+            text-decoration: none;
         }
 
-        .filter-label {
-            font-weight: 600;
-            font-size: 14px;
+        .add-employee-btn:hover {
+            background-color: #c72020;
         }
 
-        .filter-select {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        /* Employees table */
-        .employees-table {
+        table {
             width: 100%;
             border-collapse: collapse;
-            background-color: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
 
-        .employees-table th {
-            background-color: #f5f5f5;
+        th, td {
             padding: 15px;
             text-align: left;
-            font-weight: 600;
-            color: #333;
+            border-bottom: 1px solid #eee;
         }
 
-        .employees-table td {
-            padding: 15px;
-            border-top: 1px solid #eee;
-        }
-
-        .employees-table tr:hover {
+        th {
             background-color: #f9f9f9;
+            font-weight: 600;
         }
 
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Estilos para los avatares de empleados */
         .employee-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background-color: #f0f0f0;
+            background-color: #e32929;
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            color: #666;
         }
 
         .employee-name {
             font-weight: 600;
         }
 
-        .employee-role {
-            display: inline-block;
+        /* Estilos para los roles de empleados */
+        .role-tag {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .role-admin {
+            background-color: #4a6cf7;
+        }
+
+        .role-vendedor {
+            background-color: #38b653;
+        }
+
+        .role-almacen {
+            background-color: #e6a919;
+        }
+
+        /* Estilos para los estados de empleados */
+        .status-tag {
             padding: 5px 10px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
         }
 
-        .role-admin {
-            background-color: #e3f2fd;
-            color: #1976d2;
-        }
-
-        .role-cashier {
-            background-color: #e8f5e9;
-            color: #388e3c;
-        }
-
-        .role-manager {
-            background-color: #fff8e1;
-            color: #ffa000;
-        }
-
         .status-active {
-            color: #388e3c;
+            background-color: #e8f5e9;
+            color: #38b653;
         }
 
         .status-inactive {
-            color: #d32f2f;
+            background-color: #ffebee;
+            color: #e32929;
         }
 
+        /* Botones de acción */
         .action-btn {
             padding: 6px 12px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             margin-right: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .view-btn {
+            background-color: #e3f2fd;
+            color: #2196f3;
         }
 
         .edit-btn {
-            background-color: #f0f0f0;
-            color: #333;
+            background-color: #fff3e0;
+            color: #ff9800;
         }
 
         .delete-btn {
             background-color: #ffebee;
-            color: #d32f2f;
+            color: #f44336;
         }
 
-        /* Pagination */
+        /* Paginación */
         .pagination {
             display: flex;
-            justify-content: center;
-            margin-top: 30px;
+            justify-content: flex-end;
+            margin-top: 20px;
             gap: 5px;
         }
 
-        .page-item {
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 500;
+        .pagination-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
             background-color: white;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
         }
 
-        .page-item.active {
+        .pagination-btn.active {
             background-color: #e32929;
             color: white;
+            border-color: #e32929;
         }
 
-        .page-item:hover:not(.active) {
-            background-color: #f0f0f0;
-        }
-
-        /* Mobile styles */
-        .mobile-menu-btn {
+        /* Estilos para modales */
+        .modal {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .close-modal {
             background: none;
             border: none;
             font-size: 24px;
             cursor: pointer;
         }
 
+        /* Estilos para el modal de detalles */
+        .employee-details {
+            padding: 0;
+        }
+
+        .detail-item {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #f5f5f5;
+            padding-bottom: 15px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            width: 150px;
+            color: #666;
+        }
+
+        .detail-value {
+            flex: 1;
+        }
+
+        .avatar-large {
+            width: 80px;
+            height: 80px;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        /* Formularios */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: #e32929;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .required::after {
+            content: "*";
+            color: #e32929;
+            margin-left: 2px;
+        }
+
+        /* Filtros y búsqueda */
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            flex: 1;
+        }
+
+        .search-box {
+            display: flex;
+        }
+
+        .search-input {
+            flex: 1;
+            border-radius: 4px 0 0 4px;
+            border-right: none;
+        }
+
+        .search-btn {
+            background-color: #e32929;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        /* Mensajes de alerta */
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .alert-success {
+            background-color: #e8f5e9;
+            color: #388e3c;
+            border: 1px solid #c8e6c9;
+        }
+
+        .alert-error {
+            background-color: #ffebee;
+            color: #d32f2f;
+            border: 1px solid #ffcdd2;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+
         @media (max-width: 768px) {
-            .navbar {
-                padding: 15px;
-            }
-
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 70px;
-                left: 0;
-                right: 0;
-                background-color: white;
-                flex-direction: column;
-                padding: 20px;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-                z-index: 100;
-            }
-
-            .nav-links.active {
-                display: flex;
-            }
-
-            .mobile-menu-btn {
-                display: block;
-            }
-
-            .main-content {
-                padding: 15px;
-            }
-
-            .page-title {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-
-            .filter-options {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .employees-table {
+            table {
                 display: block;
                 overflow-x: auto;
+            }
+
+            th, td {
+                min-width: 120px;
+            }
+
+            .filters {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <div class="navbar">
-        <a href="index.html" class="logo">COMICS</a>
-        
-        <button class="mobile-menu-btn">☰</button>
-        
+<header>
+    <div class="logo">COMICS</div>
+    <nav>
         <ul class="nav-links">
-            <li><a href="{{ url_for('productos') }}">Productos</a></li>
-            <li><a href="{{ url_for('empleados') }}" class="active">Empleados</a></li>
-            <li><a href="{{ url_for('proveedores') }}">Proveedores</a></li>
-            <li><a href="{{ url_for('clientes') }}">Clientes</a></li>
+            <li><a href="/productos">Productos</a></li>
+            <li><a href="/empleados">Empleados</a></li>
+            <li><a href="/proveedores">Proveedores</a></li>
+            <li><a href="/clientes">Clientes</a></li>
         </ul>
-        
-        
-        <div class="user-menu">
-            <div class="user-avatar">A</div>
-            <span class="user-name">Admin</span>
-            <span class="dropdown-icon">▼</span>
+    </nav>
+</header>
+
+<div class="container">
+    <!-- Mensajes flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+            {{ message }}
         </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="table-header">
+        <h2 class="section-title">Empleados</h2>
+        <button onclick="mostrarModalNuevo()" class="add-employee-btn">+ Añadir empleado</button>
     </div>
 
-    <!-- Main content -->
-    <div class="main-content">
-        <div class="page-title">
-            <h1>Empleados</h1>
-            <button class="add-btn">+ Agregar Empleado</button>
-        </div>
-
-        <div class="filters-section">
-            <div class="search-bar">
-                <input type="text" class="search-input" placeholder="Buscar empleados...">
-                <button class="search-btn">🔍</button>
+    <form action="/empleados" method="get">
+        <div class="filters">
+            <div class="filter-group">
+                <select id="roleFilter" name="role" onchange="this.form.submit()">
+                    <option value="">Todos los roles</option>
+                    {% if roles %}
+                    {% for rol in roles %}
+                    <option value="{{ rol.id_rol }}" {% if role== rol.id_rol|string %}selected{% endif %}>
+                        {{ rol.nombre_rol|title }}
+                    </option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
             </div>
-
-            <div class="filter-options">
-                <div class="filter-group">
-                    <span class="filter-label">Rol:</span>
-                    <select class="filter-select">
-                        <option value="all">Todos</option>
-                        <option value="admin">Administrador</option>
-                        <option value="manager">Gerente</option>
-                        <option value="cashier">Cajero</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <span class="filter-label">Estado:</span>
-                    <select class="filter-select">
-                        <option value="all">Todos</option>
-                        <option value="active">Activo</option>
-                        <option value="inactive">Inactivo</option>
-                    </select>
-                </div>
+            <div class="filter-group">
+                <select id="statusFilter" name="status" onchange="this.form.submit()">
+                    <option value="">Todos los estados</option>
+                    <option value="1" {% if status==
+                    '1' %}selected{% endif %}>Activo</option>
+                    <option value="2" {% if status==
+                    '2' %}selected{% endif %}>Inactivo</option>
+                </select>
+            </div>
+            <div class="filter-group search-box">
+                <input type="text" placeholder="Buscar empleado..." class="search-input"
+                       id="searchInput" name="search" value="{{ search }}">
+                <button type="submit" class="search-btn">🔍</button>
             </div>
         </div>
+    </form>
 
-        <table class="employees-table">
+    {% if error %}
+    <div class="alert alert-error">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <div class="employees-table">
+        <table>
             <thead>
-                <tr>
-                    <th>Empleado</th>
-                    <th>Email</th>
-                    <th>Teléfono</th>
-                    <th>Rol</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
+            <tr>
+                <th>ID</th>
+                <th>Empleado</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>ID Puesto</th>
+                <th>Estado</th>
+                <th>Usuario</th>
+                <th>Fecha contratación</th>
+                <th>Acciones</th>
+            </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div class="employee-avatar">JD</div>
-                            <span class="employee-name">Juan Pérez</span>
+            <tbody id="employeesTableBody">
+            {% if empleados %}
+            {% for empleado in empleados %}
+            <tr>
+                <td>{{ empleado.id_empleado }}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="employee-avatar">
+                            {{ empleado.nombre[0] }}{{ empleado.apellidos[0] if empleado.apellidos else '' }}
                         </div>
-                    </td>
-                    <td>juan.perez@comics.com</td>
-                    <td>555-123-4567</td>
-                    <td><span class="employee-role role-admin">Administrador</span></td>
-                    <td><span class="status-active">Activo</span></td>
-                    <td>
-                        <button class="action-btn edit-btn">Editar</button>
-                        <button class="action-btn delete-btn">Eliminar</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div class="employee-avatar">ML</div>
-                            <span class="employee-name">María López</span>
-                        </div>
-                    </td>
-                    <td>maria.lopez@comics.com</td>
-                    <td>555-987-6543</td>
-                    <td><span class="employee-role role-cashier">Cajero</span></td>
-                    <td><span class="status-active">Activo</span></td>
-                    <td>
-                        <button class="action-btn edit-btn">Editar</button>
-                        <button class="action-btn delete-btn">Eliminar</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div class="employee-avatar">RG</div>
-                            <span class="employee-name">Roberto González</span>
-                        </div>
-                    </td>
-                    <td>roberto.gonzalez@comics.com</td>
-                    <td>555-456-7890</td>
-                    <td><span class="employee-role role-manager">Gerente</span></td>
-                    <td><span class="status-active">Activo</span></td>
-                    <td>
-                        <button class="action-btn edit-btn">Editar</button>
-                        <button class="action-btn delete-btn">Eliminar</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div class="employee-avatar">LR</div>
-                            <span class="employee-name">Laura Ramírez</span>
-                        </div>
-                    </td>
-                    <td>laura.ramirez@comics.com</td>
-                    <td>555-789-0123</td>
-                    <td><span class="employee-role role-cashier">Cajero</span></td>
-                    <td><span class="status-inactive">Inactivo</span></td>
-                    <td>
-                        <button class="action-btn edit-btn">Editar</button>
-                        <button class="action-btn delete-btn">Eliminar</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div class="employee-avatar">CM</div>
-                            <span class="employee-name">Carlos Mendoza</span>
-                        </div>
-                    </td>
-                    <td>carlos.mendoza@comics.com</td>
-                    <td>555-234-5678</td>
-                    <td><span class="employee-role role-cashier">Cajero</span></td>
-                    <td><span class="status-active">Activo</span></td>
-                    <td>
-                        <button class="action-btn edit-btn">Editar</button>
-                        <button class="action-btn delete-btn">Eliminar</button>
-                    </td>
-                </tr>
+                        <span class="employee-name">{{ empleado.nombre }} {{ empleado.apellidos }}</span>
+                    </div>
+                </td>
+                <td>{{ empleado.email }}</td>
+                <td>{{ empleado.telefono or 'No disponible' }}</td>
+                <td>{{ empleado.id_puesto }}</td>
+                <td>
+                                <span class="status-tag {% if empleado.id_status == 1 %}status-active{% else %}status-inactive{% endif %}">
+                                    {{ 'Activo' if empleado.id_status == 1 else 'Inactivo' }}
+                                </span>
+                </td>
+                <td>{{ empleado.nombre_usuario }}</td>
+                <td>
+                    {% if empleado.fecha_contratacion %}
+                    {{ empleado.fecha_contratacion }}
+                    {% else %}
+                    No disponible
+                    {% endif %}
+                </td>
+                <td>
+                    <button onclick='verEmpleado({{ empleado|tojson|safe }})' class="action-btn view-btn">Ver</button>
+                    <button onclick='editarEmpleado({{ empleado|tojson|safe }})' class="action-btn edit-btn">Editar
+                    </button>
+                    <button class="action-btn delete-btn" onclick="confirmarEliminar({{ empleado.id_empleado }})">
+                        Eliminar
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="9">No hay empleados registrados.</td>
+            </tr>
+            {% endif %}
             </tbody>
         </table>
-
-        <div class="pagination">
-            <div class="page-item">«</div>
-            <div class="page-item active">1</div>
-            <div class="page-item">2</div>
-            <div class="page-item">3</div>
-            <div class="page-item">»</div>
-        </div>
     </div>
 
-    <script>
-        // Funcionalidad para el menú móvil
-        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
-            document.querySelector('.nav-links').classList.toggle('active');
-        });
+    <div class="pagination">
+        {% if page > 1 %}
+        <a href="/empleados?page={{ page - 1 }}&search={{ search }}&role={{ role }}&status={{ status }}"
+           class="pagination-btn">Anterior</a>
+        {% else %}
+        <button class="pagination-btn" disabled>Anterior</button>
+        {% endif %}
 
-        // Funcionalidad para la paginación
-        document.querySelectorAll('.page-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.page-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
+        <span class="pagination-btn active">{{ page }}</span>
 
-        // Funcionalidad para los filtros
-        document.querySelectorAll('.filter-select').forEach(select => {
-            select.addEventListener('change', function() {
-                const role = document.querySelector('.filter-select:nth-child(1)').value;
-                const status = document.querySelector('.filter-select:nth-child(2)').value;
-                
-                console.log(`Filtros aplicados: Rol=${role}, Estado=${status}`);
-                // Aquí iría la lógica para filtrar los empleados
-            });
-        });
+        <a href="/empleados?page={{ page + 1 }}&search={{ search }}&role={{ role }}&status={{ status }}"
+           class="pagination-btn">Siguiente</a>
+    </div>
+</div>
 
-        // Funcionalidad para la búsqueda
-        document.querySelector('.search-btn').addEventListener('click', function() {
-            const searchTerm = document.querySelector('.search-input').value;
-            if (searchTerm) {
-                console.log(`Buscando: ${searchTerm}`);
-                // Aquí iría la lógica para buscar empleados
+<!-- Modal para confirmar eliminación -->
+<div class="modal" id="deleteModal">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">
+            <h3 class="modal-title">Confirmar eliminación</h3>
+            <button class="close-modal" onclick="cerrarModal('deleteModal')">×</button>
+        </div>
+        <p style="margin-bottom: 20px;">¿Está seguro de que desea eliminar este empleado? Esta acción no se puede
+            deshacer.</p>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button onclick="cerrarModal('deleteModal')" class="btn btn-secondary">Cancelar</button>
+            <form id="deleteForm" method="post" action="">
+                <button type="submit" class="btn btn-primary" style="background-color: #f44336;">Eliminar</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver detalles del empleado -->
+<div class="modal" id="viewModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Detalles del Empleado</h3>
+            <button class="close-modal" onclick="cerrarModal('viewModal')">×</button>
+        </div>
+        <div class="employee-details">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div class="employee-avatar avatar-large" style="margin: 0 auto; display: flex;">
+                    <span id="viewInitials"></span>
+                </div>
+                <h2 id="viewFullName" style="margin-top: 10px;"></h2>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Email:</div>
+                <div class="detail-value" id="viewEmail"></div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Teléfono:</div>
+                <div class="detail-value" id="viewTelefono"></div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Puesto:</div>
+                <div class="detail-value" id="viewPuesto"></div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Rol:</div>
+                <div class="detail-value" id="viewRol"></div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Estado:</div>
+                <div class="detail-value" id="viewEstado"></div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Fecha contratación:</div>
+                <div class="detail-value" id="viewFechaContratacion"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="cerrarModal('viewModal')">Cerrar</button>
+            <button class="btn btn-primary" id="btnEditarDesdeDetalle">Editar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar empleado -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="editModalTitle">Editar Empleado</h3>
+            <button class="close-modal" onclick="cerrarModal('editModal')">×</button>
+        </div>
+        <form id="empleadoForm" method="post" onsubmit="return validarYEnviarFormulario()">
+            <input type="hidden" id="id_empleado" name="id_empleado">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nombre" class="required">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="apellidos" class="required">Apellidos</label>
+                    <input type="text" id="apellidos" name="apellidos" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="required">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="telefono">Teléfono</label>
+                    <input type="tel" id="telefono" name="telefono">
+                </div>
+                <div class="form-group">
+                    <label for="id_puesto" class="required">ID Puesto</label>
+                    <input type="number" id="id_puesto" name="id_puesto" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="id_status" class="required">Estado</label>
+                    <select id="id_status" name="id_status" required>
+                        <option value="1">Activo</option>
+                        <option value="2">Inactivo</option>
+                    </select>
+                </div>
+                <div class="form-group" id="nombreUsuarioGroup">
+                    <label for="nombre_usuario" class="required">Nombre de usuario</label>
+                    <input type="text" id="nombre_usuario" name="nombre_usuario">
+                </div>
+            </div>
+
+            <div class="form-row" id="passwordGroup">
+                <div class="form-group">
+                    <label for="password" class="required">Contraseña</label>
+                    <input type="password" id="password" name="password">
+                </div>
+                <div class="form-group"></div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fecha_contratacion">Fecha de contratación</label>
+                    <input type="date" id="fecha_contratacion" name="fecha_contratacion">
+                </div>
+                <div class="form-group">
+                    <label for="fecha_nacimiento">Fecha de nacimiento</label>
+                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento">
+                </div>
+            </div>
+
+            <div class="modal-footer">j
+                <button type="button" class="btn btn-secondary" onclick="cerrarModal('editModal')">Cancelar</button>
+                <button type="submit" class="btn btn-primary" id="btnGuardar">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Función para preparar el formulario antes de enviar
+    function prepararFormulario() {
+        console.log("Preparando formulario para envío...");
+        const form = document.getElementById('empleadoForm');
+        const isNewEmployee = form.action.includes('/empleados/nuevo');
+
+        // Si estamos en modo edición, asegúrate de que los campos obligatorios para edición estén presentes
+        if (!isNewEmployee) {
+            // Asegúrate de que id_status sea un número
+            const idStatusEl = document.getElementById('id_status');
+            if (idStatusEl && idStatusEl.value) {
+                idStatusEl.value = parseInt(idStatusEl.value);
             }
-        });
 
-        // Permitir búsqueda con Enter
-        document.querySelector('.search-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.querySelector('.search-btn').click();
+            // Asegúrate de que id_puesto sea un número
+            const idPuestoEl = document.getElementById('id_puesto');
+            if (idPuestoEl && idPuestoEl.value) {
+                idPuestoEl.value = parseInt(idPuestoEl.value);
             }
-        });
 
-        // Funcionalidad para los botones de acción
-        document.querySelectorAll('.edit-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const row = this.closest('tr');
-                const employeeName = row.querySelector('.employee-name').textContent;
-                alert(`Editando empleado: ${employeeName}`);
-            });
-        });
+            // Verifica que al menos se envíen los campos obligatorios
+            if (!document.getElementById('nombre').value ||
+                !document.getElementById('apellidos').value ||
+                !document.getElementById('email').value ||
+                !document.getElementById('id_puesto').value) {
+                alert("Por favor completa todos los campos obligatorios");
+                return false;
+            }
+        }
 
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const row = this.closest('tr');
-                const employeeName = row.querySelector('.employee-name').textContent;
-                if (confirm(`¿Está seguro que desea eliminar al empleado ${employeeName}?`)) {
-                    row.remove();
+        // Imprime los datos que se van a enviar para depuración
+        const formData = new FormData(form);
+        console.log("Datos a enviar:");
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
+
+        return true;
+    }
+
+    // Modal de confirmación de eliminación
+    function confirmarEliminar(empleadoId) {
+        const modal = document.getElementById('deleteModal');
+        const form = document.getElementById('deleteForm');
+
+        form.action = `/empleados/eliminar/${empleadoId}`;
+        modal.style.display = 'flex';
+    }
+
+    // Cerrar un modal específico por su ID
+    function cerrarModal(modalId) {
+        const modal = document.getElementById(modalId);
+        modal.style.display = 'none';
+    }
+
+    // Cerrar modales al hacer clic fuera
+    window.onclick = function (event) {
+        const modales = document.getElementsByClassName('modal');
+        for (let i = 0; i < modales.length; i++) {
+            if (event.target === modales[i]) {
+                modales[i].style.display = 'none';
+            }
+        }
+    };
+
+    // Mostrar modal para ver detalles de empleado
+    function verEmpleado(empleado) {
+        console.log("Ver empleado:", empleado);
+        const modal = document.getElementById('viewModal');
+
+        // Llenar datos en el modal
+        document.getElementById('viewInitials').textContent = empleado.nombre[0] + (empleado.apellidos ? empleado.apellidos[0] : '');
+        document.getElementById('viewFullName').textContent = empleado.nombre + ' ' + empleado.apellidos;
+        document.getElementById('viewEmail').textContent = empleado.email;
+        document.getElementById('viewTelefono').textContent = empleado.telefono || 'No disponible';
+        document.getElementById('viewPuesto').textContent = empleado.puesto;
+        document.getElementById('viewRol').textContent = empleado.rol || 'Desconocido';
+
+        // Estado con formato
+        const estadoEl = document.getElementById('viewEstado');
+        estadoEl.textContent = empleado.id_status === 1 ? 'Activo' : 'Inactivo';
+        estadoEl.className = empleado.id_status === 1 ? 'status-tag status-active' : 'status-tag status-inactive';
+
+        document.getElementById('viewFechaContratacion').textContent = empleado.fecha_contratacion || 'No disponible';
+
+        // Configurar botón para editar desde detalles
+        document.getElementById('btnEditarDesdeDetalle').onclick = function () {
+            cerrarModal('viewModal');
+            editarEmpleado(empleado);
+        };
+
+        // Mostrar modal
+        modal.style.display = 'flex';
+    }
+
+    // Mostrar modal para editar empleado
+    function editarEmpleado(empleado) {
+        console.log("Editar empleado:", empleado);
+        const modal = document.getElementById('editModal');
+        const form = document.getElementById('empleadoForm');
+
+        // Configurar título del modal y URL del formulario
+        document.getElementById('editModalTitle').textContent = 'Editar Empleado';
+        form.action = `/empleados/editar/${empleado.id_empleado}`;
+
+        // Llenar el formulario con los datos del empleado
+        document.getElementById('id_empleado').value = empleado.id_empleado;
+        document.getElementById('nombre').value = empleado.nombre || '';
+        document.getElementById('apellidos').value = empleado.apellidos || '';
+        document.getElementById('email').value = empleado.email || '';
+        document.getElementById('telefono').value = empleado.telefono || '';
+        document.getElementById('puesto').value = empleado.puesto || '';
+
+        // Establecer valores de selección
+        const rolSelect = document.getElementById('id_rol');
+        if (empleado.id_rol) {
+            // Buscar si existe la opción
+            for (let i = 0; i < rolSelect.options.length; i++) {
+                if (rolSelect.options[i].value == empleado.id_rol) {
+                    rolSelect.selectedIndex = i;
+                    break;
                 }
-            });
-        });
+            }
+        }
 
-        // Funcionalidad para agregar empleado
-        document.querySelector('.add-btn').addEventListener('click', function() {
-            alert('Abriendo formulario para agregar nuevo empleado');
-        });
-    </script>
+        document.getElementById('id_status').value = empleado.id_status || 1;
+
+        // Formatear fecha para el input date si existe
+        if (empleado.fecha_contratacion) {
+            // Asumiendo que la fecha viene en formato 'DD/MM/YYYY' o similar
+            // Convertir a formato 'YYYY-MM-DD' para el input date
+            let fechaPartes = empleado.fecha_contratacion.split('/');
+            if (fechaPartes.length === 3) {
+                document.getElementById('fecha_contratacion').value =
+                    `${fechaPartes[2]}-${fechaPartes[1].padStart(2, '0')}-${fechaPartes[0].padStart(2, '0')}`;
+            } else {
+                // Si ya viene en formato ISO o YYYY-MM-DD
+                document.getElementById('fecha_contratacion').value = empleado.fecha_contratacion;
+            }
+        } else {
+            document.getElementById('fecha_contratacion').value = '';
+        }
+
+        // Mostrar modal
+        modal.style.display = 'flex';
+    }
+
+    // Mostrar modal para nuevo empleado
+    function mostrarModalNuevo() {
+        const modal = document.getElementById('editModal');
+        const form = document.getElementById('empleadoForm');
+
+        // Configurar título del modal y URL del formulario
+        document.getElementById('editModalTitle').textContent = 'Nuevo Empleado';
+        form.action = '/empleados/nuevo';
+
+        // Limpiar formulario
+        form.reset();
+        document.getElementById('id_empleado').value = '';
+
+        // Mostrar modal
+        modal.style.display = 'flex';
+    }
+</script>
 </body>
 </html>
