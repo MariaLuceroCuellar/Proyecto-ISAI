@@ -4,8 +4,9 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 import uvicorn
 
-from .config import settings
-from .api import auth, clientes, empleados, proveedores, productos, inventario, pedidos, compras
+# Correct imports (assuming you're running from project root)
+from app.config import settings
+from app.api import auth, clientes, empleados, proveedores, productos, inventario, pedidos, compras
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -13,7 +14,7 @@ app = FastAPI(
     description="API para la tienda de cómics y figuras de acción"
 )
 
-# Configuración de CORS
+# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -22,7 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Manejador de errores de validación
+# Validation error handler
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
@@ -30,7 +31,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content={"detail": exc.errors(), "body": exc.body},
     )
 
-# Rutas API
+# API Routes
 app.include_router(auth.router, prefix="/auth", tags=["Autenticación"])
 app.include_router(clientes.router, prefix="/clientes", tags=["Clientes"])
 app.include_router(empleados.router, prefix="/empleados", tags=["Empleados"])
