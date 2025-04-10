@@ -505,9 +505,7 @@
                     <th>Acciones</th>
                 </tr>
             </thead>
-        <tbody>
-            {% if clientes %}
-                {% for cliente in clientes %}
+            <tbody>
                 <tr>
                     <td>
                         <div style="display: flex; align-items: center; gap: 10px;">
@@ -517,30 +515,90 @@
                             <span class="customer-name">{{ cliente.nombre }} {{ cliente.apellido }}</span>
                         </div>
                     </td>
-                    <td>{{ cliente.email }}</td>
-                    <td>{{ cliente.telefono }}</td>
-                    <td>
-                        <span class="customer-type 
-                            {% if cliente.tipo == 'VIP' %}type-vip
-                            {% elif cliente.tipo == 'Nuevo' %}type-new
-                            {% else %}type-regular{% endif %}">
-                            {{ cliente.tipo }}
-                        </span>
-                    </td>
-                    <td>{{ cliente.total_compras or 0 }}</td>
-                    <td>${{ cliente.total_gastado or 0.00 }}</td>
+                    <td>luis.perez@email.com</td>
+                    <td>555-123-4567</td>
+                    <td><span class="customer-type type-vip">VIP</span></td>
+                    <td>24</td>
+                    <td>$1,245.50</td>
                     <td>
                         <button class="action-btn view-btn">Ver</button>
                         <button class="action-btn edit-btn">Editar</button>
                         <button class="action-btn delete-btn">Eliminar</button>
                     </td>
                 </tr>
-                {% endfor %}
-            {% else %}
-                <tr><td colspan="7">No hay clientes registrados.</td></tr>
-            {% endif %}
-        </tbody>
-
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="customer-avatar">MG</div>
+                            <span class="customer-name">María González</span>
+                        </div>
+                    </td>
+                    <td>maria.gonzalez@email.com</td>
+                    <td>555-987-6543</td>
+                    <td><span class="customer-type type-regular">Regular</span></td>
+                    <td>12</td>
+                    <td>$678.25</td>
+                    <td>
+                        <button class="action-btn view-btn">Ver</button>
+                        <button class="action-btn edit-btn">Editar</button>
+                        <button class="action-btn delete-btn">Eliminar</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="customer-avatar">JR</div>
+                            <span class="customer-name">Javier Rodríguez</span>
+                        </div>
+                    </td>
+                    <td>javier.rodriguez@email.com</td>
+                    <td>555-456-7890</td>
+                    <td><span class="customer-type type-new">Nuevo</span></td>
+                    <td>3</td>
+                    <td>$145.75</td>
+                    <td>
+                        <button class="action-btn view-btn">Ver</button>
+                        <button class="action-btn edit-btn">Editar</button>
+                        <button class="action-btn delete-btn">Eliminar</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="customer-avatar">AM</div>
+                            <span class="customer-name">Ana Martínez</span>
+                        </div>
+                    </td>
+                    <td>ana.martinez@email.com</td>
+                    <td>555-789-0123</td>
+                    <td><span class="customer-type type-vip">VIP</span></td>
+                    <td>18</td>
+                    <td>$987.50</td>
+                    <td>
+                        <button class="action-btn view-btn">Ver</button>
+                        <button class="action-btn edit-btn">Editar</button>
+                        <button class="action-btn delete-btn">Eliminar</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="customer-avatar">CS</div>
+                            <span class="customer-name">Carlos Sánchez</span>
+                        </div>
+                    </td>
+                    <td>carlos.sanchez@email.com</td>
+                    <td>555-234-5678</td>
+                    <td><span class="customer-type type-regular">Regular</span></td>
+                    <td>8</td>
+                    <td>$432.75</td>
+                    <td>
+                        <button class="action-btn view-btn">Ver</button>
+                        <button class="action-btn edit-btn">Editar</button>
+                        <button class="action-btn delete-btn">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
         </table>
 
         <div class="pagination">
