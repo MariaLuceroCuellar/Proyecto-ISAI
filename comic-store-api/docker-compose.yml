@@ -6,7 +6,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=mysql+pymysql://root:dbpassword@db/ComicStore
+      - DATABASE_URL=mysql+pymysql://root:dbpassword@db/comicstore
     depends_on:
       db:
         condition: service_healthy
@@ -18,7 +18,7 @@ services:
     image: mysql:8.0
     environment:
       - MYSQL_ROOT_PASSWORD=dbpassword
-      - MYSQL_DATABASE=ComicStore
+      - MYSQL_DATABASE=comicstore
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
