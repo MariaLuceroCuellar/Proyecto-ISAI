@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes - Comics POS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-weight: 900;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: black;
+        }
+
+        .logo::before {
+            content: "";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: black;
+            margin-right: 10px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 70%, 0 100%);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            padding: 8px 0;
+            position: relative;
+        }
+
+        .nav-links li a.active {
+            color: #e32929;
+            font-weight: 600;
+        }
+
+        .nav-links li a.active::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #e32929;
+        }
+
+        .user-menu {
+            position: relative;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e32929;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .user-name {
+            font-weight: 500;
+        }
+
+        .dropdown-icon {
+            margin-left: 8px;
+            font-size: 12px;
+        }
+
+        /* Main content styles */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-title {
+            font-size: 28px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-btn {
+            background-color: #e32929;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Search and filter section */
+        .filters-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .search-bar {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+            font-size: 14px;
+        }
+
+        .search-btn {
+            padding: 10px 20px;
+            background-color: #e32929;
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        /* Customers table */
+        .customers-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .customers-table th {
+            background-color: #f5f5f5;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .customers-table td {
+            padding: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .customers-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .customer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .customer-name {
+            font-weight: 600;
+        }
+
+        .customer-type {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .type-regular {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .type-vip {
+            background-color: #fff8e1;
+            color: #ffa000;
+        }
+
+        .type-new {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-right: 5px;
+        }
+
+        .edit-btn {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .delete-btn {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
+        .view-btn {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        /* Customer stats */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-up {
+            color: #388e3c;
+        }
+
+        .stat-down {
+            color: #d32f2f;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 5px;
+        }
+
+        .page-item {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .page-item.active {
+            background-color: #e32929;
+            color: white;
+        }
+
+        .page-item:hover:not(.active) {
+            background-color: #f0f0f0;
+        }
+
+        /* Mobile styles */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background-color: white;
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                z-index: 100;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .page-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .filter-options {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .customers-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="index.html" class="logo">COMICS</a>
+        
+        <button class="mobile-menu-btn">☰</button>
+        
+        <ul class="nav-links">
+            <li><a href="{{ url_for('productos') }}">Productos</a></li>
+            <li><a href="{{ url_for('empleados') }}" class="active">Empleados</a></li>
+            <li><a href="{{ url_for('proveedores') }}">Proveedores</a></li>
+            <li><a href="{{ url_for('clientes') }}">Clientes</a></li>
+        </ul>
+        
+        
+        <div class="user-menu">
+            <div class="user-avatar">A</div>
+            <span class="user-name">Admin</span>
+            <span class="dropdown-icon">▼</span>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="page-title">
+            <h1>Clientes</h1>
+            <button class="add-btn">+ Agregar Cliente</button>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-title">Total Clientes</div>
+                <div class="stat-value">1,248</div>
+                <div class="stat-change stat-up">↑ 12% desde el mes pasado</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Clientes Nuevos</div>
+                <div class="stat-value">86</div>
+                <div class="stat-change stat-up">↑ 24% desde el mes pasado</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Clientes VIP</div>
+                <div class="stat-value">124</div>
+                <div class="stat-change stat-up">↑ 5% desde el mes pasado</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Valor Promedio</div>
+                <div class="stat-value">$458</div>
+                <div class="stat-change stat-down">↓ 3% desde el mes pasado</div>
+            </div>
+        </div>
+
+        <div class="filters-section">
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Buscar clientes...">
+                <button class="search-btn">🔍</button>
+            </div>
+
+            <div class="filter-options">
+                <div class="filter-group">
+                    <span class="filter-label">Tipo:</span>
+                    <select class="filter-select">
+                        <option value="all">Todos</option>
+                        <option value="regular">Regular</option>
+                        <option value="vip">VIP</option>
+                        <option value="new">Nuevo</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Ordenar por:</span>
+                    <select class="filter-select">
+                        <option value="name">Nombre</option>
+                        <option value="date">Fecha de registro</option>
+                        <option value="purchases">Compras</option>
+                        <option value="value">Valor</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <table class="customers-table">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Tipo</th>
+                    <th>Compras</th>
+                    <th>Valor Total</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+        <tbody>
+            {% if clientes %}
+                {% for cliente in clientes %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="customer-avatar">
+                                {{ cliente.get("nombre", "?")[0] }}{{ cliente.get("apellido", "?")[0] }}
+                            </div>
+                            <span class="customer-name">{{ cliente.nombre }} {{ cliente.apellido }}</span>
+                        </div>
+                    </td>
+                    <td>{{ cliente.email }}</td>
+                    <td>{{ cliente.telefono }}</td>
+                    <td>
+                        <span class="customer-type 
+                            {% if cliente.tipo == 'VIP' %}type-vip
+                            {% elif cliente.tipo == 'Nuevo' %}type-new
+                            {% else %}type-regular{% endif %}">
+                            {{ cliente.tipo }}
+                        </span>
+                    </td>
+                    <td>{{ cliente.total_compras or 0 }}</td>
+                    <td>${{ cliente.total_gastado or 0.00 }}</td>
+                    <td>
+                        <button class="action-btn view-btn">Ver</button>
+                        <button class="action-btn edit-btn">Editar</button>
+                        <button class="action-btn delete-btn">Eliminar</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td colspan="7">No hay clientes registrados.</td></tr>
+            {% endif %}
+        </tbody>
+
+        </table>
+
+        <div class="pagination">
+            <div class="page-item">«</div>
+            <div class="page-item active">1</div>
+            <div class="page-item">2</div>
+            <div class="page-item">3</div>
+            <div class="page-item">»</div>
+        </div>
+    </div>
+
+    <script>
+        // Funcionalidad para el menú móvil
+        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.toggle('active');
+        });
+
+        // Funcionalidad para la paginación
+        document.querySelectorAll('.page-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.page-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Funcionalidad para los filtros
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const type = document.querySelector('.filter-select:nth-child(1)').value;
+                const sort = document.querySelector('.filter-select:nth-child(2)').value;
+                
+                console.log(`Filtros aplicados: Tipo=${type}, Ordenar por=${sort}`);
+                // Aquí iría la lógica para filtrar los clientes
+            });
+        });
+
+        // Funcionalidad para la búsqueda
+        document.querySelector('.search-btn').addEventListener('click', function() {
+            const searchTerm = document.querySelector('.search-input').value;
+            if (searchTerm) {
+                console.log(`Buscando: ${searchTerm}`);
+                // Aquí iría la lógica para buscar clientes
+            }
+        });
+
+        // Permitir búsqueda con Enter
+        document.querySelector('.search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.querySelector('.search-btn').click();
+            }
+        });
+
+        // Funcionalidad para los botones de acción
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const customerName = row.querySelector('.customer-name').textContent;
+                alert(`Viendo detalles del cliente: ${customerName}`);
+            });
+        });
+
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const customerName = row.querySelector('.customer-name').textContent;
+                alert(`Editando cliente: ${customerName}`);
+            });
+        });
+
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const customerName = row.querySelector('.customer-name').textContent;
+                if (confirm(`¿Está seguro que desea eliminar al cliente ${customerName}?`)) {
+                    row.remove();
+                }
+            });
+        });
+
+        // Funcionalidad para agregar cliente
+        document.querySelector('.add-btn').addEventListener('click', function() {
+            alert('Abriendo formulario para agregar nuevo cliente');
+        });
+    </script>
+</body>
+</html>

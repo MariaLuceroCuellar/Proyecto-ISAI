@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proveedores - Comics POS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-weight: 900;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: black;
+        }
+
+        .logo::before {
+            content: "";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: black;
+            margin-right: 10px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 70%, 0 100%);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            padding: 8px 0;
+            position: relative;
+        }
+
+        .nav-links li a.active {
+            color: #e32929;
+            font-weight: 600;
+        }
+
+        .nav-links li a.active::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #e32929;
+        }
+
+        .user-menu {
+            position: relative;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e32929;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .user-name {
+            font-weight: 500;
+        }
+
+        .dropdown-icon {
+            margin-left: 8px;
+            font-size: 12px;
+        }
+
+        /* Main content styles */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-title {
+            font-size: 28px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-btn {
+            background-color: #e32929;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Search and filter section */
+        .filters-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .search-bar {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+            font-size: 14px;
+        }
+
+        .search-btn {
+            padding: 10px 20px;
+            background-color: #e32929;
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        /* Suppliers cards */
+        .suppliers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .supplier-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .supplier-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .supplier-header {
+            padding: 20px;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .supplier-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 24px;
+            color: #666;
+        }
+
+        .supplier-name {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .supplier-category {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .supplier-body {
+            padding: 20px;
+        }
+
+        .supplier-info {
+            margin-bottom: 15px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        .supplier-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .supplier-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .edit-btn {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .delete-btn {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
+        .order-btn {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 5px;
+        }
+
+        .page-item {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .page-item.active {
+            background-color: #e32929;
+            color: white;
+        }
+
+        .page-item:hover:not(.active) {
+            background-color: #f0f0f0;
+        }
+
+        /* Mobile styles */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background-color: white;
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                z-index: 100;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .page-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .filter-options {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .suppliers-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="index.html" class="logo">COMICS</a>
+        
+        <button class="mobile-menu-btn">☰</button>
+        
+        <ul class="nav-links">
+            <li><a href="{{ url_for('productos') }}">Productos</a></li>
+            <li><a href="{{ url_for('empleados') }}" class="active">Empleados</a></li>
+            <li><a href="{{ url_for('proveedores') }}">Proveedores</a></li>
+            <li><a href="{{ url_for('clientes') }}">Clientes</a></li>
+        </ul>
+        
+        
+        <div class="user-menu">
+            <div class="user-avatar">A</div>
+            <span class="user-name">Admin</span>
+            <span class="dropdown-icon">▼</span>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="page-title">
+            <h1>Proveedores</h1>
+            <button class="add-btn">+ Agregar Proveedor</button>
+        </div>
+
+        <div class="filters-section">
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Buscar proveedores...">
+                <button class="search-btn">🔍</button>
+            </div>
+
+            <div class="filter-options">
+                <div class="filter-group">
+                    <span class="filter-label">Categoría:</span>
+                    <select class="filter-select">
+                        <option value="all">Todos</option>
+                        <option value="comics">Comics</option>
+                        <option value="manga">Manga</option>
+                        <option value="merch">Merchandising</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">País:</span>
+                    <select class="filter-select">
+                        <option value="all">Todos</option>
+                        <option value="mexico">México</option>
+                        <option value="usa">Estados Unidos</option>
+                        <option value="spain">España</option>
+                        <option value="japan">Japón</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="suppliers-grid">
+            <div class="supplier-card">
+                <div class="supplier-header">
+                    <div class="supplier-logo">MC</div>
+                    <div>
+                        <h3 class="supplier-name">Marvel Comics</h3>
+                        <div class="supplier-category">Comics</div>
+                    </div>
+                </div>
+                <div class="supplier-body">
+                    <div class="supplier-info">
+                        <div class="info-label">Contacto</div>
+                        <div class="info-value">John Smith</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">Email</div>
+                        <div class="info-value">john.smith@marvel.com</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">Teléfono</div>
+                        <div class="info-value">+1 (555) 123-4567</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">País</div>
+                        <div class="info-value">Estados Unidos</div>
+                    </div>
+                    <div class="supplier-actions">
+                        <button class="supplier-btn edit-btn">Editar</button>
+                        <button class="supplier-btn delete-btn">Eliminar</button>
+                        <button class="supplier-btn order-btn">Ordenar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="supplier-card">
+                <div class="supplier-header">
+                    <div class="supplier-logo">DC</div>
+                    <div>
+                        <h3 class="supplier-name">DC Comics</h3>
+                        <div class="supplier-category">Comics</div>
+                    </div>
+                </div>
+                <div class="supplier-body">
+                    <div class="supplier-info">
+                        <div class="info-label">Contacto</div>
+                        <div class="info-value">Jane Doe</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">Email</div>
+                        <div class="info-value">jane.doe@dc.com</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">Teléfono</div>
+                        <div class="info-value">+1 (555) 987-6543</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">País</div>
+                        <div class="info-value">Estados Unidos</div>
+                    </div>
+                    <div class="supplier-actions">
+                        <button class="supplier-btn edit-btn">Editar</button>
+                        <button class="supplier-btn delete-btn">Eliminar</button>
+                        <button class="supplier-btn order-btn">Ordenar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="supplier-card">
+                <div class="supplier-header">
+                    <div class="supplier-logo">SJ</div>
+                    <div>
+                        <h3 class="supplier-name">Shonen Jump</h3>
+                        <div class="supplier-category">Manga</div>
+                    </div>
+                </div>
+                <div class="supplier-body">
+                    <div class="supplier-info">
+                        <div class="info-label">Contacto</div>
+                        <div class="info-value">Takashi Yamamoto</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">Email</div>
+                        <div class="info-value">t.yamamoto@shonenjump.jp</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">Teléfono</div>
+                        <div class="info-value">+81 3-1234-5678</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">País</div>
+                        <div class="info-value">Japón</div>
+                    </div>
+                    <div class="supplier-actions">
+                        <button class="supplier-btn edit-btn">Editar</button>
+                        <button class="supplier-btn delete-btn">Eliminar</button>
+                        <button class="supplier-btn order-btn">Ordenar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="supplier-card">
+                <div class="supplier-header">
+                    <div class="supplier-logo">PN</div>
+                    <div>
+                        <h3 class="supplier-name">Planeta Comics</h3>
+                        <div class="supplier-category">Comics</div>
+                    </div>
+                </div>
+                <div class="supplier-body">
+                    <div class="supplier-info">
+                        <div class="info-label">Contacto</div>
+                        <div class="info-value">Carlos Rodríguez</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">Email</div>
+                        <div class="info-value">c.rodriguez@planeta.es</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">Teléfono</div>
+                        <div class="info-value">+34 91 123 45 67</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">País</div>
+                        <div class="info-value">España</div>
+                    </div>
+                    <div class="supplier-actions">
+                        <button class="supplier-btn edit-btn">Editar</button>
+                        <button class="supplier-btn delete-btn">Eliminar</button>
+                        <button class="supplier-btn order-btn">Ordenar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="supplier-card">
+                <div class="supplier-header">
+                    <div class="supplier-logo">FM</div>
+                    <div>
+                        <h3 class="supplier-name">Funko Merch</h3>
+                        <div class="supplier-category">Merchandising</div>
+                    </div>
+                </div>
+                <div class="supplier-body">
+                    <div class="supplier-info">
+                        <div class="info-label">Contacto</div>
+                        <div class="info-value">Mike Johnson</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">Email</div>
+                        <div class="info-value">mike.j@funko.com</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">Teléfono</div>
+                        <div class="info-value">+1 (555) 456-7890</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">País</div>
+                        <div class="info-value">Estados Unidos</div>
+                    </div>
+                    <div class="supplier-actions">
+                        <button class="supplier-btn edit-btn">Editar</button>
+                        <button class="supplier-btn delete-btn">Eliminar</button>
+                        <button class="supplier-btn order-btn">Ordenar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="supplier-card">
+                <div class="supplier-header">
+                    <div class="supplier-logo">PM</div>
+                    <div>
+                        <h3 class="supplier-name">Panini México</h3>
+                        <div class="supplier-category">Comics</div>
+                    </div>
+                </div>
+                <div class="supplier-body">
+                    <div class="supplier-info">
+                        <div class="info-label">Contacto</div>
+                        <div class="info-value">Ana Martínez</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">Email</div>
+                        <div class="info-value">a.martinez@panini.mx</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">Teléfono</div>
+                        <div class="info-value">+52 55 1234 5678</div>
+                    </div>
+                    <div class="supplier-info">
+                        <div class="info-label">País</div>
+                        <div class="info-value">México</div>
+                    </div>
+                    <div class="supplier-actions">
+                        <button class="supplier-btn edit-btn">Editar</button>
+                        <button class="supplier-btn delete-btn">Eliminar</button>
+                        <button class="supplier-btn order-btn">Ordenar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination">
+            <div class="page-item">«</div>
+            <div class="page-item active">1</div>
+            <div class="page-item">2</div>
+            <div class="page-item">3</div>
+            <div class="page-item">»</div>
+        </div>
+    </div>
+
+    <script>
+        // Funcionalidad para el menú móvil
+        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.toggle('active');
+        });
+
+        // Funcionalidad para la paginación
+        document.querySelectorAll('.page-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.page-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Funcionalidad para los filtros
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const category = document.querySelector('.filter-select:nth-child(1)').value;
+                const country = document.querySelector('.filter-select:nth-child(2)').value;
+                
+                console.log(`Filtros aplicados: Categoría=${category}, País=${country}`);
+                // Aquí iría la lógica para filtrar los proveedores
+            });
+        });
+
+        // Funcionalidad para la búsqueda
+        document.querySelector('.search-btn').addEventListener('click', function() {
+            const searchTerm = document.querySelector('.search-input').value;
+            if (searchTerm) {
+                console.log(`Buscando: ${searchTerm}`);
+                // Aquí iría la lógica para buscar proveedores
+            }
+        });
+
+        // Permitir búsqueda con Enter
+        document.querySelector('.search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.querySelector('.search-btn').click();
+            }
+        });
+
+        // Funcionalidad para los botones de acción
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const card = this.closest('.supplier-card');
+                const supplierName = card.querySelector('.supplier-name').textContent;
+                alert(`Editando proveedor: ${supplierName}`);
+            });
+        });
+
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const card = this.closest('.supplier-card');
+                const supplierName = card.querySelector('.supplier-name').textContent;
+                if (confirm(`¿Está seguro que desea eliminar al proveedor ${supplierName}?`)) {
+                    card.remove();
+                }
+            });
+        });
+
+        document.querySelectorAll('.order-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const card = this.closest('.supplier-card');
+                const supplierName = card.querySelector('.supplier-name').textContent;
+                alert(`Realizando pedido al proveedor: ${supplierName}`);
+            });
+        });
+
+        // Funcionalidad para agregar proveedor
+        document.querySelector('.add-btn').addEventListener('click', function() {
+            alert('Abriendo formulario para agregar nuevo proveedor');
+        });
+    </script>
+</body>
+</html>
