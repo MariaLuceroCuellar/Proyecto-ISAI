@@ -19,6 +19,14 @@ def productos():
         productos = []
     return render_template('productos.html', productos=productos)
 
+@app.route('/pedidos')
+def pedidos():
+    try:
+        response = requests.get(f"{API_URL}/pedidos")
+        pedidos = response.json()
+    except:
+        pedidos = []
+    return render_template('pedidos.html', pedidos=pedidos)
 @app.route('/empleados')
 def empleados():
     try:

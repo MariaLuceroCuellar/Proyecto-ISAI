@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Pedidos - Tienda de Cómics</title>
+    <!-- Incluir tus estilos originales aquí -->
+    
+    <style>
+         /* Estilos generales */
+         * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* Estilos del encabezado */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-weight: 900;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo::before {
+            content: "";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: black;
+            margin-right: 10px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 70%, 0 100%);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+        }
+
+        nav ul li a.active {
+            color: #e32929;
+            font-weight: bold;
+        }
+
+        /* Contenedor principal */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        /* Filtros */
+        .filters {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .filter-group button {
+            padding: 8px 20px;
+            background-color: #e32929;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            height: 35px;
+        }
+
+        /* Tabla de pedidos */
+        .pedidos-table {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #f9f9f9;
+            font-weight: 600;
+            color: #555;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .estado {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .estado-pendiente {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .estado-procesado {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .estado-entregado {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .estado-cancelado {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .acciones {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-accion {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 5px;
+            border-radius: 3px;
+        }
+
+        .btn-ver {
+            color: #007bff;
+        }
+
+        .btn-cancelar {
+            color: #dc3545;
+        }
+
+        /* Paginación */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .pagination button.active {
+            background-color: #e32929;
+            color: white;
+            border-color: #e32929;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 800px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Detalles del pedido */
+        .pedido-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .pedido-info, .cliente-info {
+            flex: 1;
+        }
+
+        .pedido-info h3, .cliente-info h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .info-item {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            display: inline-block;
+            width: 120px;
+        }
+
+        .detalles-table {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .pedido-totales {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 5px;
+        }
+
+        .total-label {
+            width: 120px;
+            text-align: right;
+            margin-right: 10px;
+            font-weight: 500;
+        }
+
+        .total-value {
+            width: 100px;
+            text-align: right;
+        }
+
+        .grand-total {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        /* Estado del pedido */
+        .estado-control {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .estado-control h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .estado-select {
+            margin-bottom: 10px;
+        }
+
+        .estado-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background-color: #e32929;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #e32929;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .pedido-header {
+                flex-direction: column;
+            }
+            
+            .cliente-info {
+                margin-top: 15px;
+            }
+            
+            .info-label {
+                width: 100px;
+            }
+            
+            .filter-group {
+                min-width: 100%;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+            }
+            
+            .acciones {
+                flex-direction: column;
+            }
+        }
+        /* Estilos mejorados para página de pedidos */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .filter-group input, 
+        .filter-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        
+        .filter-group button {
+            height: 42px;
+            background-color: #e32929;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .filter-group button:hover {
+            background-color: #c72020;
+        }
+        
+        /* Estilos para tabla de pedidos */
+        .pedidos-table {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f9f9f9;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .action-button {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+            margin: 0 5px;
+            border-radius: 50%;
+            height: 35px;
+            width: 35px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .view-btn {
+            color: #007bff;
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+        
+        .view-btn:hover {
+            background-color: rgba(0, 123, 255, 0.2);
+        }
+        
+        .delete-btn {
+            color: #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+        
+        .delete-btn:hover {
+            background-color: rgba(220, 53, 69, 0.2);
+        }
+        
+        /* Estilos para paginación */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 20px;
+        }
+        
+        .pagination button {
+            min-width: 40px;
+            height: 40px;
+            border: 1px solid #ddd;
+            background-color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .pagination button:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .pagination button.active {
+            background-color: #e32929;
+            color: white;
+            border-color: #e32929;
+        }
+        
+        /* Estilos para modal de detalles */
+        .detalles-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+        
+        .detalles-info {
+            flex: 1;
+        }
+        
+        .detalles-info h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        
+        .info-row {
+            margin-bottom: 8px;
+            display: flex;
+        }
+        
+        .info-label {
+            font-weight: 500;
+            width: 120px;
+            color: #666;
+        }
+        
+        .detalles-table {
+            width: 100%;
+            margin: 20px 0;
+        }
+        
+        .detalles-table th,
+        .detalles-table td {
+            padding: 12px 10px;
+        }
+        
+        .detalles-footer {
+            margin-top: 25px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 8px;
+        }
+        
+        .total-label {
+            width: 120px;
+            text-align: right;
+            font-weight: 500;
+            padding-right: 15px;
+        }
+        
+        .grand-total {
+            font-size: 18px;
+            font-weight: bold;
+            color: #e32929;
+        }
+        
+        /* Estilos para mensajes de no resultados */
+        .no-results {
+            text-align: center;
+            padding: 40px 0;
+            color: #666;
+        }
+        
+        .no-results i {
+            font-size: 48px;
+            color: #ddd;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        /* Loader */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #e32929;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">COMICS</div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('productos') }}">Productos</a></li>
+                <li>
+                  <a href="{{ url_for('empleados') }}" >Empleados</a>
+                </li>
+                <li><a href="{{ url_for('pedidos') }}" >Pedidos</a></li>
+                <li><a href="{{ url_for('proveedores') }}">Proveedores</a></li>
+                <li><a href="{{ url_for('clientes') }}">Clientes</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1>Gestión de Pedidos</h1>
+        
+        <div class="filters">
+            <div class="filter-group">
+                <label for="numPedido">Número de Pedido</label>
+                <input type="text" id="numPedido" placeholder="Ej: PED-20250410-ABC12">
+            </div>
+            <div class="filter-group">
+                <label for="clienteFilter">Cliente</label>
+                <input type="text" id="clienteFilter" placeholder="Nombre o email del cliente">
+            </div>
+            <div class="filter-group">
+                <label for="fechaDesde">Desde</label>
+                <input type="date" id="fechaDesde">
+            </div>
+            <div class="filter-group">
+                <button id="buscarBtn">Buscar Pedidos</button>
+            </div>
+        </div>
+
+        <div class="pedidos-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Vendedor</th>
+                        <th>Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="pedidosTableBody">
+                    <!-- Los pedidos se cargarán dinámicamente con JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination" id="pagination">
+            <!-- Paginación generada dinámicamente -->
+        </div>
+    </div>
+
+    <!-- Modal para ver detalles del pedido -->
+    <div class="modal" id="pedidoDetalleModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('pedidoDetalleModal')">&times;</span>
+            <h2>Detalles del Pedido</h2>
+            <div id="pedidoDetalle">
+                <!-- Contenido dinámico del pedido -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay de carga -->
+    <div id="loadingSpinner" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+
+    <script>
+        // Configuración de la API
+        const API_URL = 'http://localhost:8000';
+        let currentPage = 1;
+        const pageSize = 10;
+        let totalPedidos = 0;
+        let clientesCache = {};
+        let empleadosCache = {};
+
+        // Función para obtener el token
+        async function getAuthToken() {
+            return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbjIiLCJleHAiOjE3NDQyNzE0NTN9.dYgGr5tYL9OIQPsiknUCND7ibJWgA2zRrHem5AeTXvY";
+        }
+
+        // Función genérica para hacer peticiones a la API
+        async function fetchAPI(endpoint, options = {}) {
+            try {
+                const token = await getAuthToken();
+                
+                if (!token && endpoint !== 'auth/login') {
+                    throw new Error('No hay sesión activa');
+                }
+                
+                const defaultOptions = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                };
+                
+                if (token) {
+                    defaultOptions.headers['Authorization'] = `Bearer ${token}`;
+                }
+                
+                const fetchOptions = {
+                    ...defaultOptions,
+                    ...options,
+                    headers: {
+                        ...defaultOptions.headers,
+                        ...options.headers
+                    }
+                };
+                
+                console.log(`Realizando petición a ${API_URL}/${endpoint}`);
+                
+                const response = await fetch(`${API_URL}/${endpoint}`, fetchOptions);
+                
+                if (!response.ok) {
+                    let errorDetail;
+                    try {
+                        const errorData = await response.json();
+                        errorDetail = errorData.detail || 'Error en la petición';
+                    } catch (e) {
+                        errorDetail = `Error ${response.status}: ${response.statusText}`;
+                    }
+                    console.error(`Error en respuesta: ${response.status}`, errorDetail);
+                    throw new Error(errorDetail);
+                }
+                
+                if (response.status !== 204) { // No content
+                    return await response.json();
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('Error en fetchAPI:', error);
+                
+                if (error.message.includes('Failed to fetch')) {
+                    throw new Error('Error de conexión con el servidor. Posible problema de CORS.');
+                }
+                
+                throw error;
+            }
+        }
+
+        // Función para obtener información del cliente
+        async function getClienteInfo(id_cliente) {
+            if (clientesCache[id_cliente]) {
+                return clientesCache[id_cliente];
+            }
+            
+            try {
+                const cliente = await fetchAPI(`clientes/${id_cliente}`);
+                clientesCache[id_cliente] = cliente;
+                return cliente;
+            } catch (error) {
+                console.warn(`No se pudo obtener información del cliente ID ${id_cliente}:`, error);
+                return null;
+            }
+        }
+
+        // Función para obtener información del empleado
+        async function getEmpleadoInfo(id_empleado) {
+            if (empleadosCache[id_empleado]) {
+                return empleadosCache[id_empleado];
+            }
+            
+            try {
+                const empleado = await fetchAPI(`empleados/${id_empleado}`);
+                empleadosCache[id_empleado] = empleado;
+                return empleado;
+            } catch (error) {
+                console.warn(`No se pudo obtener información del empleado ID ${id_empleado}:`, error);
+                return null;
+            }
+        }
+
+        // Función para cargar los pedidos
+        async function loadPedidos() {
+            try {
+                document.getElementById('loadingSpinner').style.display = 'flex';
+                
+                // Obtener parámetros de filtro
+                const numeroPedido = document.getElementById('numPedido').value;
+                const clienteFilter = document.getElementById('clienteFilter').value;
+                const fechaDesde = document.getElementById('fechaDesde').value;
+                
+                // Construir la URL con los parámetros
+                let url = `pedidos?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`;
+                
+                // Búsqueda por cliente (necesitamos hacerlo en dos pasos)
+                let id_cliente = null;
+                if (clienteFilter) {
+                    try {
+                        // Buscar cliente por nombre o email
+                        const clientes = await fetchAPI(`clientes?search=${encodeURIComponent(clienteFilter)}`);
+                        if (clientes && clientes.length > 0) {
+                            id_cliente = clientes[0].id_cliente;
+                            url += `&id_cliente=${id_cliente}`;
+                        }
+                    } catch (error) {
+                        console.warn('Error al buscar cliente:', error);
+                    }
+                }
+                
+                // Filtro por fecha
+                if (fechaDesde) {
+                    url += `&fecha_desde=${fechaDesde}`;
+                }
+                
+                // Obtener pedidos
+                const pedidos = await fetchAPI(url);
+                
+                // Si hay filtro por número de pedido, filtrar del lado del cliente
+                let pedidosFiltrados = pedidos;
+                if (numeroPedido && numeroPedido.trim() !== '') {
+                    pedidosFiltrados = pedidos.filter(p => 
+                        p.numero_pedido.toLowerCase().includes(numeroPedido.toLowerCase())
+                    );
+                }
+                
+                await renderPedidos(pedidosFiltrados);
+                
+                document.getElementById('loadingSpinner').style.display = 'none';
+            } catch (error) {
+                console.error('Error al cargar pedidos:', error);
+                document.getElementById('loadingSpinner').style.display = 'none';
+                alert(`Error al cargar pedidos: ${error.message}`);
+            }
+        }
+
+        // Función para mostrar los pedidos en la tabla
+        async function renderPedidos(pedidos) {
+            const tableBody = document.getElementById('pedidosTableBody');
+            tableBody.innerHTML = '';
+            
+            if (!pedidos || pedidos.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="no-results">
+                            <i>📋</i>
+                            <p>No se encontraron pedidos con los filtros seleccionados</p>
+                        </td>
+                    </tr>`;
+                return;
+            }
+            
+            // Para cada pedido, tenemos que cargar los datos del cliente y empleado
+            for (const pedido of pedidos) {
+                const row = document.createElement('tr');
+                
+                // Formatear fecha
+                const fecha = new Date(pedido.fecha_creacion).toLocaleString();
+                
+                // Obtener información del cliente
+                let clienteNombre = `Cliente ID: ${pedido.id_cliente}`;
+                const cliente = await getClienteInfo(pedido.id_cliente);
+                if (cliente) {
+                    clienteNombre = `${cliente.nombre} ${cliente.apellidos}`;
+                }
+                
+                // Obtener información del vendedor
+                let vendedorNombre = `No asignado`;
+                if (pedido.id_empleado) {
+                    const empleado = await getEmpleadoInfo(pedido.id_empleado);
+                    if (empleado) {
+                        vendedorNombre = `${empleado.nombre} ${empleado.apellidos}`;
+                    }
+                }
+                
+                row.innerHTML = `
+                    <td>${pedido.numero_pedido}</td>
+                    <td>${fecha}</td>
+                    <td>${clienteNombre}</td>
+                    <td>${vendedorNombre}</td>
+                    <td>$${parseFloat(pedido.total).toFixed(2)}</td>
+                    <td>
+                        <button class="action-button view-btn" title="Ver detalles" onclick="verDetallePedido(${pedido.id_pedido})">👁️</button>
+                        <button class="action-button delete-btn" title="Eliminar pedido" onclick="eliminarPedido(${pedido.id_pedido})">🗑️</button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            }
+            
+            // Actualizar paginación
+            updatePagination(pedidos.length);
+        }
+
+        // Función para actualizar la paginación
+        function updatePagination(count) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+            
+            // Si no hay pedidos, no mostrar paginación
+            if (count === 0) return;
+            
+            // Calcular total de páginas (asumimos que hay más páginas)
+            const totalPages = Math.max(1, Math.ceil(totalPedidos / pageSize));
+            
+            // Botón anterior
+            const prevBtn = document.createElement('button');
+            prevBtn.textContent = '«';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.onclick = () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadPedidos();
+                }
+            };
+            pagination.appendChild(prevBtn);
+            
+            // Páginas
+            for (let i = 1; i <= totalPages; i++) {
+                if (
+                    i === 1 || 
+                    i === totalPages || 
+                    (i >= currentPage - 2 && i <= currentPage + 2)
+                ) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.textContent = i;
+                    pageBtn.classList.toggle('active', i === currentPage);
+                    pageBtn.onclick = () => {
+                        currentPage = i;
+                        loadPedidos();
+                    };
+                    pagination.appendChild(pageBtn);
+                } else if (
+                    i === currentPage - 3 || 
+                    i === currentPage + 3
+                ) {
+                    const ellipsis = document.createElement('button');
+                    ellipsis.textContent = '...';
+                    ellipsis.disabled = true;
+                    pagination.appendChild(ellipsis);
+                }
+            }
+            
+            // Botón siguiente
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = '»';
+            nextBtn.disabled = currentPage === totalPages || count < pageSize;
+            nextBtn.onclick = () => {
+                currentPage++;
+                loadPedidos();
+            };
+            pagination.appendChild(nextBtn);
+        }
+
+        // Función para ver detalle de pedido
+        async function verDetallePedido(pedidoId) {
+            try {
+                document.getElementById('loadingSpinner').style.display = 'flex';
+                
+                // Obtener detalles del pedido
+                const pedido = await fetchAPI(`pedidos/${pedidoId}`);
+                
+                // Obtener información del cliente
+                let clienteNombre = `Cliente ID: ${pedido.id_cliente}`;
+                let clienteEmail = '';
+                const cliente = await getClienteInfo(pedido.id_cliente);
+                if (cliente) {
+                    clienteNombre = `${cliente.nombre} ${cliente.apellidos}`;
+                    clienteEmail = cliente.email;
+                }
+                
+                // Obtener información del vendedor
+                let vendedorNombre = `No asignado`;
+                if (pedido.id_empleado) {
+                    const empleado = await getEmpleadoInfo(pedido.id_empleado);
+                    if (empleado) {
+                        vendedorNombre = `${empleado.nombre} ${empleado.apellidos}`;
+                    }
+                }
+                
+                // Formatear fecha
+                const fecha = new Date(pedido.fecha_creacion).toLocaleString();
+                
+                // Construir HTML de detalles
+                let detallesHTML = `
+                    <div class="detalles-header">
+                        <div class="detalles-info">
+                            <h3>Información del Pedido</h3>
+                            <div class="info-row">
+                                <span class="info-label">Número:</span>
+                                <span>${pedido.numero_pedido}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Fecha:</span>
+                                <span>${fecha}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Vendedor:</span>
+                                <span>${vendedorNombre}</span>
+                            </div>
+                        </div>
+                        <div class="detalles-info">
+                            <h3>Información del Cliente</h3>
+                            <div class="info-row">
+                                <span class="info-label">Cliente:</span>
+                                <span>${clienteNombre}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Email:</span>
+                                <span>${clienteEmail}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <table class="detalles-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                                <th>Descuento</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                // Obtener y agregar filas de productos
+                for (const detalle of pedido.detalles) {
+                    let nombreProducto = `Producto ID: ${detalle.id_producto}`;
+                    try {
+                        const producto = await fetchAPI(`productos/${detalle.id_producto}`);
+                        if (producto) {
+                            nombreProducto = producto.nombre;
+                        }
+                    } catch (error) {
+                        console.warn(`No se pudo cargar información del producto ID ${detalle.id_producto}:`, error);
+                    }
+                    
+                    const precioConFormato = parseFloat(detalle.precio_unitario).toFixed(2);
+                    const descuentoConFormato = parseFloat(detalle.descuento_unitario).toFixed(2);
+                    const subtotalConFormato = parseFloat(detalle.subtotal).toFixed(2);
+                    
+                    detallesHTML += `
+                        <tr>
+                            <td>${nombreProducto}</td>
+                            <td class="text-center">${detalle.cantidad}</td>
+                            <td class="text-right">$${precioConFormato}</td>
+                            <td class="text-right">$${descuentoConFormato}</td>
+                            <td class="text-right">$${subtotalConFormato}</td>
+                        </tr>
+                    `;
+                }
+                
+                detallesHTML += `
+                        </tbody>
+                    </table>
+                    
+                    <div class="detalles-footer">
+                        <div class="total-row">
+                            <span class="total-label">Subtotal:</span>
+                            <span>$${parseFloat(pedido.subtotal).toFixed(2)}</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="total-label">Descuento:</span>
+                            <span>$${parseFloat(pedido.descuento).toFixed(2)}</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="total-label">Impuestos:</span>
+                            <span>$${parseFloat(pedido.impuestos).toFixed(2)}</span>
+                        </div>
+                        <div class="total-row grand-total">
+                            <span class="total-label">Total:</span>
+                            <span>$${parseFloat(pedido.total).toFixed(2)}</span>
+                        </div>
+                    </div>
+                `;
+                
+                // Mostrar notas si existen
+                if (pedido.notas) {
+                    detallesHTML += `
+                        <div class="notas-seccion">
+                            <h3>Notas</h3>
+                            <p>${pedido.notas}</p>
+                        </div>
+                    `;
+                }
+                
+                // Botones de acción
+                detallesHTML += `
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal('pedidoDetalleModal')">Cerrar</button>
+                        <button class="btn btn-primary" onclick="eliminarPedido(${pedido.id_pedido})">Eliminar Pedido</button>
+                    </div>
+                `;
+                
+                // Actualizar contenido del modal
+                document.getElementById('pedidoDetalle').innerHTML = detallesHTML;
+                
+                // Mostrar modal
+                document.getElementById('pedidoDetalleModal').style.display = 'block';
+                
+                document.getElementById('loadingSpinner').style.display = 'none';
+            } catch (error) {
+                console.error('Error al cargar detalles del pedido:', error);
+                document.getElementById('loadingSpinner').style.display = 'none';
+                alert(`Error al cargar detalles del pedido: ${error.message}`);
+            }
+        }
+
+        // Función para eliminar un pedido (usando cancelar pedido)
+        async function eliminarPedido(pedidoId) {
+            if (!confirm('¿Está seguro de que desea eliminar este pedido? Esta acción no se puede deshacer.')) {
+                return;
+            }
+            
+            try {
+                document.getElementById('loadingSpinner').style.display = 'flex';
+                
+                // Usamos el endpoint de cancelación para "eliminar" el pedido
+                await fetchAPI(`pedidos/${pedidoId}/cancelar`, {
+                    method: 'POST'
+                });
+                
+                alert('Pedido cancelado/eliminado correctamente');
+                
+                // Cerrar modal si está abierto
+                closeModal('pedidoDetalleModal');
+                
+                // Recargar pedidos
+                loadPedidos();
+                
+                document.getElementById('loadingSpinner').style.display = 'none';
+            } catch (error) {
+                console.error('Error al eliminar pedido:', error);
+                document.getElementById('loadingSpinner').style.display = 'none';
+                alert(`Error al eliminar pedido: ${error.message}`);
+            }
+        }
+
+        // Función para abrir modal
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        // Función para cerrar modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar pedidos
+            loadPedidos();
+            
+            // Configurar botón de búsqueda
+            document.getElementById('buscarBtn').addEventListener('click', function() {
+                currentPage = 1;
+                loadPedidos();
+            });
+            
+            // Configurar eventos de teclado para búsqueda
+            document.querySelectorAll('.filter-group input').forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        currentPage = 1;
+                        loadPedidos();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
