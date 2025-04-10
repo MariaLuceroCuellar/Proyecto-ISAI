@@ -48,7 +48,7 @@ def proveedores():
 @app.route('/clientes')
 def clientes():
     try:
-        response = requests.get("http://127.0.0.1:8000/clientes")
+        response = requests.get(f"{API_URL}/proveedores")
         clientes = response.json()
 
         # Mostramos cada objeto recibido para revisar su formato

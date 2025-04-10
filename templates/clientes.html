@@ -512,7 +512,7 @@
                     <td>
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <div class="customer-avatar">
-                                {{ cliente.get("nombre", "?")[0] }}{{ cliente.get("apellido", "?")[0] }}
+                                {{ cliente.nombre[0] if cliente.nombre else "?" }}{{ cliente.apellido[0] if cliente.apellido else "?" }}
                             </div>
                             <span class="customer-name">{{ cliente.nombre }} {{ cliente.apellido }}</span>
                         </div>

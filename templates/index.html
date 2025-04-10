@@ -1,364 +1,402 @@
 <!-- index.html -->
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Acceso al Sistema - Comics POS</title>
-     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Acceso al Sistema - Comics POS</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
 
-        body {
-            background-color: #f5f5f5;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-image: url('/placeholder.svg?height=1080&width=1920');
-            background-size: cover;
-            background-position: center;
-            position: relative;
-        }
+      body {
+        background-color: #f5f5f5;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-image: url("/placeholder.svg?height=1080&width=1920");
+        background-size: cover;
+        background-position: center;
+        position: relative;
+      }
 
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.6);
-            z-index: 1;
-        }
+      body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 1;
+      }
 
+      .login-container {
+        width: 100%;
+        max-width: 420px;
+        padding: 40px 30px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        position: relative;
+        z-index: 2;
+      }
+
+      .logo-container {
+        text-align: center;
+        margin-bottom: 25px;
+      }
+
+      .logo {
+        font-weight: 900;
+        font-size: 32px;
+        color: black;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        margin-bottom: 10px;
+      }
+
+      .logo::before {
+        content: "";
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        background-color: black;
+        margin-right: 10px;
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 70%, 0 100%);
+      }
+
+      .access-badge {
+        display: block;
+        background-color: #e32929;
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 20px;
+        margin: 0 auto;
+        width: fit-content;
+      }
+
+      .login-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 5px;
+        text-align: center;
+      }
+
+      .login-subtitle {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 25px;
+        text-align: center;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #333;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: #e32929;
+      }
+
+      .password-container {
+        position: relative;
+      }
+
+      .toggle-password {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #666;
+        font-size: 14px;
+      }
+
+      .remember-forgot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        font-size: 14px;
+      }
+
+      .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .forgot-password {
+        color: #e32929;
+        text-decoration: none;
+      }
+
+      .forgot-password:hover {
+        text-decoration: underline;
+      }
+
+      .login-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #e32929;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .login-btn:hover {
+        background-color: #c72020;
+      }
+
+      .error-message {
+        color: #e32929;
+        font-size: 14px;
+        margin-top: 5px;
+        display: none;
+      }
+
+      .security-notice {
+        margin-top: 25px;
+        padding: 12px;
+        background-color: #f8f8f8;
+        border-left: 3px solid #e32929;
+        font-size: 12px;
+        color: #666;
+        line-height: 1.5;
+      }
+
+      @media (max-width: 480px) {
         .login-container {
-            width: 100%;
-            max-width: 420px;
-            padding: 40px 30px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-            position: relative;
-            z-index: 2;
+          padding: 30px 20px;
+          margin: 0 15px;
         }
-
-        .logo-container {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .logo {
-            font-weight: 900;
-            font-size: 32px;
-            color: black;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            margin-bottom: 10px;
-        }
-
-        .logo::before {
-            content: "";
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            background-color: black;
-            margin-right: 10px;
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 70%, 0 100%);
-        }
-
-        .access-badge {
-            display: block;
-            background-color: #e32929;
-            color: white;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 20px;
-            margin: 0 auto;
-            width: fit-content;
-        }
-
-        .login-title {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 5px;
-            text-align: center;
-        }
-
-        .login-subtitle {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #e32929;
-        }
-
-        .password-container {
-            position: relative;
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .remember-forgot {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            font-size: 14px;
-        }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .forgot-password {
-            color: #e32929;
-            text-decoration: none;
-        }
-
-        .forgot-password:hover {
-            text-decoration: underline;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 12px;
-            background-color: #e32929;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .login-btn:hover {
-            background-color: #c72020;
-        }
-
-        .error-message {
-            color: #e32929;
-            font-size: 14px;
-            margin-top: 5px;
-            display: none;
-        }
-
-        .security-notice {
-            margin-top: 25px;
-            padding: 12px;
-            background-color: #f8f8f8;
-            border-left: 3px solid #e32929;
-            font-size: 12px;
-            color: #666;
-            line-height: 1.5;
-        }
-
-        @media (max-width: 480px) {
-            .login-container {
-                padding: 30px 20px;
-                margin: 0 15px;
-            }
-        }
+      }
     </style>
-</head>
-<body>
-  <div class="login-container">
-    <div class="logo-container">
-      <div class="logo">COMICS</div>
-      <div class="access-badge">ACCESO DE PERSONAL</div>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="logo-container">
+        <div class="logo">COMICS</div>
+        <div class="access-badge">ACCESO DE PERSONAL</div>
+      </div>
+
+      <h1 class="login-title">Iniciar Sesión</h1>
+      <p class="login-subtitle">
+        Ingresa tus credenciales para acceder al sistema
+      </p>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="username" class="form-label">Nombre de usuario</label>
+          <input
+            type="text"
+            id="username"
+            class="form-input"
+            placeholder="Ingresa tu nombre de usuario"
+            required
+          />
+          <div class="error-message" id="username-error">
+            Por favor ingresa un usuario válido
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-label">Contraseña</label>
+          <div class="password-container">
+            <input
+              type="password"
+              id="password"
+              class="form-input"
+              placeholder="Ingresa tu contraseña"
+              required
+            />
+            <button type="button" class="toggle-password" id="toggle-password">
+              Mostrar
+            </button>
+          </div>
+          <div class="error-message" id="password-error">
+            Contraseña incorrecta
+          </div>
+        </div>
+
+        <div class="remember-forgot">
+          <div class="remember-me">
+            <input type="checkbox" id="remember" />
+            <label for="remember">Mantener sesión</label>
+          </div>
+          <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <button type="submit" class="login-btn">Acceder al Sistema</button>
+      </form>
+
+      <div class="security-notice">
+        <strong>Aviso de seguridad:</strong> Este sistema es solo para personal
+        autorizado. Los intentos de acceso no autorizados serán monitoreados y
+        pueden tener consecuencias legales. Si tienes problemas para acceder,
+        contacta a tu supervisor.
+      </div>
     </div>
 
-    <h1 class="login-title">Iniciar Sesión</h1>
-    <p class="login-subtitle">Ingresa tus credenciales para acceder al sistema</p>
+    <script>
+      document
+        .getElementById("toggle-password")
+        .addEventListener("click", function () {
+          const passwordInput = document.getElementById("password");
+          const toggleButton = document.getElementById("toggle-password");
 
-    <form id="login-form">
-      <div class="form-group">
-        <label for="username" class="form-label">Nombre de usuario</label>
-        <input type="text" id="username" class="form-input" placeholder="Ingresa tu nombre de usuario" required />
-        <div class="error-message" id="username-error">Por favor ingresa un usuario válido</div>
-      </div>
+          if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            toggleButton.textContent = "Ocultar";
+          } else {
+            passwordInput.type = "password";
+            toggleButton.textContent = "Mostrar";
+          }
+        });
 
-      <div class="form-group">
-        <label for="password" class="form-label">Contraseña</label>
-        <div class="password-container">
-          <input type="password" id="password" class="form-input" placeholder="Ingresa tu contraseña" required />
-          <button type="button" class="toggle-password" id="toggle-password">Mostrar</button>
-        </div>
-        <div class="error-message" id="password-error">Contraseña incorrecta</div>
-      </div>
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
 
-      <div class="remember-forgot">
-        <div class="remember-me">
-          <input type="checkbox" id="remember" />
-          <label for="remember">Mantener sesión</label>
-        </div>
-        <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
-      </div>
+          const username = document.getElementById("username").value.trim();
+          const password = document.getElementById("password").value;
+          const remember = document.getElementById("remember").checked;
 
-      <button type="submit" class="login-btn">Acceder al Sistema</button>
-    </form>
+          let isValid = true;
 
-    <div class="security-notice">
-      <strong>Aviso de seguridad:</strong> Este sistema es solo para personal autorizado.
-      Los intentos de acceso no autorizados serán monitoreados y pueden tener consecuencias legales.
-      Si tienes problemas para acceder, contacta a tu supervisor.
-    </div>
-  </div>
+          if (!username) {
+            document.getElementById("username-error").style.display = "block";
+            isValid = false;
+          } else {
+            document.getElementById("username-error").style.display = "none";
+          }
 
-  <script>
-    document.getElementById('toggle-password').addEventListener('click', function () {
-      const passwordInput = document.getElementById('password');
-      const toggleButton = document.getElementById('toggle-password');
+          if (!password || password.length < 4) {
+            document.getElementById("password-error").style.display = "block";
+            isValid = false;
+          } else {
+            document.getElementById("password-error").style.display = "none";
+          }
 
-      if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        toggleButton.textContent = 'Ocultar';
-      } else {
-        passwordInput.type = 'password';
-        toggleButton.textContent = 'Mostrar';
-      }
-    });
+          if (!isValid) return;
 
-    document.getElementById('login-form').addEventListener('submit', async function (e) {
-      e.preventDefault();
+          try {
+            const response = await authenticateUser(username, password);
 
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value;
-      const remember = document.getElementById('remember').checked;
+            if (response.success) {
+              const storage = remember ? localStorage : sessionStorage;
+              storage.setItem("authToken", response.token);
+              storage.setItem("userData", JSON.stringify(response.user));
 
-      let isValid = true;
+              redirectBasedOnRole(response.user.id_rol);
+            } else {
+              document.getElementById("password-error").textContent =
+                response.message || "Credenciales incorrectas";
+              document.getElementById("password-error").style.display = "block";
+            }
+          } catch (error) {
+            console.error("Error en el login:", error);
+            document.getElementById("password-error").textContent =
+              "Error al conectar con el servidor";
+            document.getElementById("password-error").style.display = "block";
+          }
+        });
+      // Modificación para la función authenticateUser en index.html
+      async function authenticateUser(username, password) {
+        try {
+          // Simular delay para mejorar UX
+          await new Promise((resolve) => setTimeout(resolve, 800));
 
-      if (!username) {
-        document.getElementById('username-error').style.display = 'block';
-        isValid = false;
-      } else {
-        document.getElementById('username-error').style.display = 'none';
-      }
+          // Usar la API real para autenticar
+          const response = await fetch("http://localhost:8000/auth/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+              username: username,
+              password: password,
+            }),
+          });
 
-      if (!password || password.length < 4) {
-        document.getElementById('password-error').style.display = 'block';
-        isValid = false;
-      } else {
-        document.getElementById('password-error').style.display = 'none';
-      }
+          // Si la API responde con error
+          if (!response.ok) {
+            const errorData = await response.json();
+            return {
+              success: false,
+              message: errorData.detail || "Error de autenticación",
+            };
+          }
 
-      if (!isValid) return;
+          // Si la autenticación es exitosa
+          const data = await response.json();
 
-      try {
-        const response = await authenticateUser(username, password);
+          // Obtener información del usuario usando el token
+          const userResponse = await fetch("http://localhost:8000/auth/me", {
+            headers: {
+              Authorization: `Bearer ${data.access_token}`,
+            },
+          });
 
-        if (response.success) {
-          const storage = remember ? localStorage : sessionStorage;
-          storage.setItem('authToken', response.token);
-          storage.setItem('userData', JSON.stringify(response.user));
+          const userData = await userResponse.json();
 
-          redirectBasedOnRole(response.user.id_rol);
-        } else {
-          document.getElementById('password-error').textContent = response.message || 'Credenciales incorrectas';
-          document.getElementById('password-error').style.display = 'block';
+          return {
+            success: true,
+            token: data.access_token,
+            user: userData,
+          };
+        } catch (error) {
+          console.error("Error al conectar con la API:", error);
+          return {
+            success: false,
+            message: "Error de conexión con el servidor",
+          };
         }
-      } catch (error) {
-        console.error('Error en el login:', error);
-        document.getElementById('password-error').textContent = 'Error al conectar con el servidor';
-        document.getElementById('password-error').style.display = 'block';
       }
-    });
+      // ✅ Función corregida: redirige a la vista correcta según el rol
+      function redirectBasedOnRole(roleId) {
+        const rolePages = {
+          1: "/clientes", // Administrador
+          2: "/POS", // Vendedor
+          3: "/productos", // Almacén
+        };
 
-    async function authenticateUser(username, password) {
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      const users = [
-        { id_empleado: 1, nombre: "Luis", apellidos: "Ramírez Vega", nombre_usuario: "luis.admin", password_hash: "", id_rol: 1, id_status: 1 },
-        { id_empleado: 2, nombre: "Patricia", apellidos: "Flores Luna", nombre_usuario: "patricia.ventas", password_hash: "", id_rol: 2, id_status: 1 },
-        { id_empleado: 3, nombre: "José", apellidos: "Torres Mora", nombre_usuario: "jose.ventas", password_hash: "", id_rol: 2, id_status: 1 },
-        { id_empleado: 4, nombre: "Alicia", apellidos: "Vargas Ríos", nombre_usuario: "alicia.almacen", password_hash: "", id_rol: 3, id_status: 1 },
-        { id_empleado: 5, nombre: "Miguel", apellidos: "Castro Lara", nombre_usuario: "miguel.admin", password_hash: "", id_rol: 1, id_status: 1 }
-      ];
-
-      const user = users.find(u => u.nombre_usuario === username);
-
-      const passwordMatches =
-        (username === 'luis.admin' && password === 'admin123') ||
-        (username === 'patricia.ventas' && password === 'ventas123') ||
-        (username === 'jose.ventas' && password === 'ventas456') ||
-        (username === 'alicia.almacen' && password === 'almacen123') ||
-        (username === 'miguel.admin' && password === 'admin456');
-
-      if (!user) return { success: false, message: 'Usuario no encontrado' };
-      if (user.id_status !== 1) return { success: false, message: 'Tu cuenta está desactivada' };
-      if (!passwordMatches) return { success: false, message: 'Contraseña incorrecta' };
-
-      const token = `fake-jwt-token.${btoa(JSON.stringify({ userId: user.id_empleado, role: user.id_rol, username: user.nombre_usuario }))}`;
-
-      return {
-        success: true,
-        token,
-        user: {
-          id_empleado: user.id_empleado,
-          nombre: user.nombre,
-          apellidos: user.apellidos,
-          id_rol: user.id_rol,
-          nombre_usuario: user.nombre_usuario,
-          id_status: user.id_status
-        }
-      };
-    }
-
-    // ✅ Función corregida: redirige a la vista correcta según el rol
-    function redirectBasedOnRole(roleId) {
-      const rolePages = {
-        1: '/clientes',   // Administrador
-        2: '/POS',        // Vendedor
-        3: '/productos'   // Almacén
-      };
-
-      const targetPage = rolePages[roleId] || '/empleados';
-      window.location.href = targetPage;
-    }
-  </script>
-</body>
+        const targetPage = rolePages[roleId] || "/empleados";
+        window.location.href = targetPage;
+      }
+    </script>
+  </body>
 </html>

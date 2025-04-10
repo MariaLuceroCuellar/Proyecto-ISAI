@@ -129,6 +129,11 @@
         margin-right: 10px;
         clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 70%, 0 100%);
       }
+      nav {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+      }
 
       nav ul {
         display: flex;
@@ -167,6 +172,14 @@
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         padding: 20px;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 30px;
+        background-color: white;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       }
 
       .section-header {
@@ -650,6 +663,102 @@
           opacity: 1;
         }
       }
+      /* Estilos para el menú de usuario */
+      .nav-links {
+        display: flex;
+        list-style: none;
+        gap: 30px;
+        margin-right: 20px; /* Añadir espacio entre los enlaces y el perfil */
+      }
+      .user-menu {
+        position: relative;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+        margin-left: auto; /* Esto empuja el perfil a la derecha */
+      }
+
+      .user-menu:hover {
+        background-color: #f5f5f5;
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #e32929;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 10px;
+      }
+
+      .user-name {
+        font-weight: 500;
+      }
+
+      .dropdown-icon {
+        margin-left: 8px;
+        font-size: 12px;
+        transition: transform 0.2s;
+      }
+
+      .user-menu:hover .dropdown-icon {
+        transform: rotate(180deg);
+      }
+
+      /* Estilos para el contenido desplegable */
+      .dropdown-content {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: white;
+        min-width: 220px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 15px;
+        display: none;
+        z-index: 1000;
+      }
+
+      .user-menu:hover .dropdown-content {
+        display: block;
+      }
+
+      .user-info {
+        margin-bottom: 15px;
+      }
+
+      .info-item {
+        padding: 5px 0;
+        font-size: 14px;
+        color: #333;
+      }
+
+      .dropdown-divider {
+        height: 1px;
+        background-color: #eee;
+        margin: 10px 0;
+      }
+
+      .dropdown-content a {
+        display: block;
+        padding: 8px 0;
+        text-decoration: none;
+        color: #e32929;
+        font-size: 14px;
+        font-weight: 500;
+        transition: opacity 0.2s;
+      }
+
+      .dropdown-content a:hover {
+        opacity: 0.8;
+      }
     </style>
   </head>
   <body>
@@ -657,14 +766,29 @@
       <div class="logo">COMICS</div>
       <nav>
         <ul class="nav-links">
-          <li><a href="{{ url_for('productos') }}" class="active">Productos</a></li>
-          <li>
-            <a href="{{ url_for('empleados') }}" class="active">Empleados</a>
-          </li>
-          <li><a href="{{ url_for('pedidos') }}" class="active">Pedidos</a></li>
-          <li><a href="{{ url_for('proveedores') }}" class="active">Proveedores</a></li>
-          <li><a href="{{ url_for('clientes') }}" class="active">Clientes</a></li>
+          <li><a href="{{ url_for('productos') }}">Productos</a></li>
+          <li><a href="{{ url_for('empleados') }}">Empleados</a></li>
+          <li><a href="{{ url_for('pedidos') }}">Pedidos</a></li>
+          <li><a href="{{ url_for('proveedores') }}">Proveedores</a></li>
+          <li><a href="{{ url_for('clientes') }}">Clientes</a></li>
         </ul>
+
+        <!-- Perfil de usuario fuera del ul pero dentro de nav -->
+        <div class="user-menu" id="user-profile">
+          <div class="user-avatar" id="user-initials">A</div>
+          <span class="user-name" id="user-display-name">Admin</span>
+          <span class="dropdown-icon">▼</span>
+
+          <div class="dropdown-content">
+            <div class="user-info">
+              <div class="info-item" id="user-full-name">Nombre completo</div>
+              <div class="info-item" id="user-role">Rol: Administrador</div>
+              <div class="info-item" id="user-position">Puesto: Gerente</div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a href="#" onclick="logout()">Cerrar sesión</a>
+          </div>
+        </div>
       </nav>
     </header>
 
@@ -808,70 +932,76 @@
       const API_URL = "http://localhost:8000"; // Cambia esto según la URL de tu API
 
       // Función para obtener el token
-      async function getAuthToken() {
-        // Obtener token desde localStorage o iniciar sesión
-        const token =
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbjIiLCJleHAiOjE3NDQyNzE0NTN9.dYgGr5tYL9OIQPsiknUCND7ibJWgA2zRrHem5AeTXvY";
-        console.log("Token usado:", token); // Para depurar
-        return token; // let token = localStorage.getItem("token");
+      //   async function getAuthToken() {
+      //     // Obtener token desde localStorage o iniciar sesión
+      //     // const token =
+      //     //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbjIiLCJleHAiOjE3NDQyNzE0NTN9.dYgGr5tYL9OIQPsiknUCND7ibJWgA2zRrHem5AeTXvY";
+      //     // console.log("Token usado:", token); // Para depurar
+      //     // return token; // let token = localStorage.getItem("token");
+      //     const token = localStorage.getItem("authToken");
+      //     if (!token) {
+      //       // Redireccionar a página de login si no hay token
+      //       window.location.href = "{{url_for('index')}}";
+      //       return null;
+      //     }
+      //     console.log("Token usado:", token);
+      //     return token;
+      //   }
+      function getStoredToken() {
+        // Intentar obtener de localStorage primero
+        let token = localStorage.getItem("authToken");
 
-        // if (!token) {
-        //   // Redireccionar a página de login si no hay token
-        //   window.location.href = "index.html";
-        //   return null;
-        // }
+        // Si no está en localStorage, intentar en sessionStorage
+        if (!token) {
+          token = sessionStorage.getItem("authToken");
+        }
 
-        // return token;
+        return token;
       }
 
       // Función genérica para hacer peticiones a la API
-      async function fetchAPI(endpoint, options = {}) {
+      async function fetchAPI(url, method = "GET", body = null) {
         try {
-          const token = await getAuthToken();
+          const token = getStoredToken();
 
-          if (!token && endpoint !== "auth/login") {
-            throw new Error("No hay sesión activa");
+          if (!token && !url.includes("auth/login")) {
+            console.error("No hay token de autenticación");
+            // Redirigir al login si no hay token
+            window.location.href = "/"; // Asumiendo que "/" es tu página de login
+            throw new Error("No autenticado");
           }
 
-          const defaultOptions = {
-            headers: {
-              "Content-Type": "application/json",
-            },
+          const headers = {
+            "Content-Type": "application/json",
           };
 
           if (token) {
-            defaultOptions.headers["Authorization"] = `Bearer ${token}`;
+            headers["Authorization"] = `Bearer ${token}`;
           }
 
-          const fetchOptions = {
-            ...defaultOptions,
-            ...options,
-            headers: {
-              ...defaultOptions.headers,
-              ...options.headers,
-            },
+          const options = {
+            method,
+            headers,
           };
 
-          console.log(`Realizando petición a ${API_URL}/${endpoint}`); // Para depurar
+          if (body) {
+            options.body = JSON.stringify(body);
+          }
 
-          const response = await fetch(`${API_URL}/${endpoint}`, fetchOptions);
+          const response = await fetch(`${API_URL}/${url}`, options);
 
           if (!response.ok) {
-            let errorDetail;
-            try {
-              const errorData = await response.json();
-              errorDetail = errorData.detail || "Error en la petición";
-            } catch (e) {
-              // Si la respuesta no es JSON válido, usar el texto directamente
-              const errorText = await response.text();
-              errorDetail =
-                errorText || `Error ${response.status}: ${response.statusText}`;
+            const status = response.status;
+            if (status === 401) {
+              // Si el token ha expirado o es inválido, redirigir al login
+              localStorage.removeItem("authToken");
+              sessionStorage.removeItem("authToken");
+              window.location.href = "/";
+              throw new Error("Credenciales inválidas");
             }
-            console.error(
-              `Error en respuesta: ${response.status}`,
-              errorDetail
+            throw new Error(
+              `Error en respuesta: ${status} ${response.statusText}`
             );
-            throw new Error(errorDetail);
           }
 
           if (response.status !== 204) {
@@ -885,6 +1015,88 @@
           throw error;
         }
       }
+      // Función para cargar el perfil del usuario
+      function loadUserProfile() {
+        // Intentar obtener los datos del usuario de localStorage o sessionStorage
+        let userData =
+          JSON.parse(localStorage.getItem("userData")) ||
+          JSON.parse(sessionStorage.getItem("userData"));
+
+        if (!userData) {
+          console.warn("No se encontraron datos de usuario");
+          return;
+        }
+
+        // Actualizar el nombre en la barra de navegación
+        const displayNameElement = document.getElementById("user-display-name");
+        if (displayNameElement) {
+          displayNameElement.textContent = userData.nombre || "Usuario";
+        }
+
+        // Actualizar las iniciales en el avatar
+        const initialsElement = document.getElementById("user-initials");
+        if (initialsElement) {
+          const initials = getInitials(userData.nombre);
+          initialsElement.textContent = initials;
+        }
+
+        // Actualizar información en el menú desplegable
+        const fullNameElement = document.getElementById("user-full-name");
+        if (fullNameElement) {
+          fullNameElement.textContent = `${userData.nombre} ${
+            userData.apellidos || ""
+          }`;
+        }
+
+        const roleElement = document.getElementById("user-role");
+        if (roleElement) {
+          const roles = {
+            1: "Administrador",
+            2: "Vendedor",
+            3: "Almacén",
+            4: "Gerente",
+          };
+          roleElement.textContent = `Rol: ${
+            roles[userData.id_rol] || "Empleado"
+          }`;
+        }
+
+        const positionElement = document.getElementById("user-position");
+        if (positionElement) {
+          positionElement.textContent = `Puesto: ${
+            userData.puesto || "Sin especificar"
+          }`;
+        }
+      }
+
+      // Función para obtener las iniciales de un nombre
+      function getInitials(name) {
+        if (!name) return "U";
+
+        const parts = name.split(" ");
+        if (parts.length === 1) {
+          return parts[0].charAt(0).toUpperCase();
+        }
+
+        return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+      }
+
+      // Función para cerrar sesión
+      function logout() {
+        // Eliminar tokens y datos de usuario
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("userData");
+        sessionStorage.removeItem("authToken");
+        sessionStorage.removeItem("userData");
+
+        // Redirigir al login
+        window.location.href = "/";
+      }
+
+      // Cargar el perfil del usuario cuando se carga la página
+      document.addEventListener("DOMContentLoaded", function () {
+        loadUserProfile();
+      });
 
       // Función para obtener todos los productos
       async function getProducts(options = {}) {
@@ -1019,10 +1231,48 @@
       // Variables globales
       let cart = [];
       let selectedCliente = { id_cliente: 1, nombre: "Cliente General" }; // Cliente por defecto
-      let empleadoActual = JSON.parse(localStorage.getItem("currentUser")) || {
-        id_empleado: 1,
-        nombre: "Juan Pérez",
-      }; // Empleado actual
+      // Reemplaza la asignación estática de empleadoActual con esta versión que usa el usuario autenticado
+      function getEmpleadoActual() {
+        // Primero intenta obtener datos de localStorage, luego de sessionStorage
+        const userData = JSON.parse(sessionStorage.getItem("userData"));
+
+        const datos = JSON.parse(sessionStorage.getItem("userData"));
+
+        console.log("Datos del usuario autenticado:", datos);
+
+        if (!userData) {
+          console.warn(
+            "No se encontraron datos de usuario, utilizando datos por defecto"
+          );
+          // Retornar un empleado por defecto solo si no hay datos (aunque esto no debería ocurrir)
+          return {
+            id_empleado: 1,
+            nombre: "Usuario Predeterminado",
+          };
+        }
+
+        // Retornar los datos del usuario autenticado
+        return {
+          id_empleado: userData.id_empleado, // Asegúrate de que este campo coincida con el formato esperado
+          nombre: `${userData.nombre} `,
+          apellidos:  `${userData.apellidos || ""}`,
+          id_rol: userData.id_rol,
+        };
+      }
+
+      // Ahora, en lugar de usar la asignación directa, usa la función:
+      let empleadoActual = getEmpleadoActual();
+      document.addEventListener("DOMContentLoaded", function () {
+        // Obtener el elemento del vendedor
+        const sellerNameElement = document.getElementById("sellerName");
+
+        // Verificar si el elemento existe y si tenemos un empleado actual
+        if (sellerNameElement && empleadoActual) {
+          // Actualizar el texto del elemento con el nombre del empleado
+          sellerNameElement.textContent = empleadoActual.nombre;
+        }
+      });
+
       let allProducts = [];
       let categories = [];
       let originalStocks = new Map();
