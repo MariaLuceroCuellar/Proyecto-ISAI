@@ -344,3 +344,44 @@ async def get_estados_pedido(
     Obtiene la lista de todos los estados de pedido.
     """
     return db.query(EstadosPedido).all()
+
+# Eliminar un pedido
+@router.delete("/{pedido_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Eliminar pedido")
+async def delete_pedido(
+    pedido_id: int,
+    db: Session = Depends(get_db),
+    current_user: Empleados = Depends(get_admin_user)  # Solo administradores
+):
+    """
+    Elimina un pedido y sus detalles.
+    
+    - **pedido_id**: ID del pedido a eliminar
+    """
+    # Verificar si el pedido existe
+    db_pedido = db.query(Pedidos).filter(Pedidos.id_pedido == pedido_id).first()
+    if db_pedido is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Pedido con ID {pedido_id} no encontrado"
+        )
+    
+    # Si está entregado, no se puede eliminar
+    if db_pedido.id_estado == 3:  # Asumiendo que 3 es "entregado"
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No se puede eliminar un pedido que ya está entregado"
+        )
+    
+    # Si no está cancelado, primero cancelarlo para devolver productos al inventario
+    if db_pedido.id_estado != 4:  # Asumiendo que 4 es "cancelado"
+        await cancelar_pedido(pedido_id, db, current_user)
+    
+    # Eliminar todos los detalles (por si acaso, aunque debería manejarse con CASCADE)
+    db.query(DetallesPedido).filter(DetallesPedido.id_pedido == pedido_id).delete()
+    
+    # Eliminar el pedido
+    db.query(Pedidos).filter(Pedidos.id_pedido == pedido_id).delete()
+    
+    db.commit()
+    
+    return None

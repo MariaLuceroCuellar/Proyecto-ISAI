@@ -49,6 +49,59 @@ async def get_productos(
     
     return query.order_by(Productos.nombre).offset(skip).limit(limit).all()
 
+
+# Obtener todas las categorías
+@router.get("/categorias", response_model=List[Categoria],  summary="Obtener lista de categorías")
+async def get_categorias(
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene la lista de todas las categorías de productos.
+    """
+    return db.query(Categorias).all()
+
+# Obtener todos los comics
+@router.get("/comics", response_model=List[ComicDetalle], summary="Obtener lista de comics")
+async def get_comics(
+    db: Session = Depends(get_db),
+    skip: int = Query(0, description="Número de registros a omitir"),
+    limit: int = Query(100, description="Número máximo de registros a devolver"),
+    search: Optional[str] = Query(None, description="Buscar por título")
+):
+    """
+    Obtiene la lista de comics.
+    """
+    query = db.query(Comics).join(Productos)
+    
+    # Aplicar filtros
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(Comics.titulo.like(search_term))
+    
+    return query.offset(skip).limit(limit).all()
+# Obtener todas las figuras
+@router.get("/figuras", response_model=List[FiguraColeccionDetalle], summary="Obtener lista de figuras")
+async def get_figuras(
+    db: Session = Depends(get_db),
+    skip: int = Query(0, description="Número de registros a omitir"),
+    limit: int = Query(100, description="Número máximo de registros a devolver"),
+    search: Optional[str] = Query(None, description="Buscar por personaje o universo")
+):
+    """
+    Obtiene la lista de figuras de colección.
+    """
+    query = db.query(FigurasColeccion).join(Productos)
+    
+    # Aplicar filtros
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(
+            (FigurasColeccion.personaje.like(search_term)) | 
+            (FigurasColeccion.universo.like(search_term))
+        )
+    
+    return query.offset(skip).limit(limit).all()
+
 # Obtener un producto por ID
 @router.get("/{producto_id}", response_model=ProductoDetalle, summary="Obtener producto por ID")
 async def get_producto(
@@ -215,25 +268,7 @@ async def create_producto_completo(
     
     return db_producto
 
-# Obtener todos los comics
-@router.get("/comics", response_model=List[ComicDetalle], summary="Obtener lista de comics")
-async def get_comics(
-    db: Session = Depends(get_db),
-    skip: int = Query(0, description="Número de registros a omitir"),
-    limit: int = Query(100, description="Número máximo de registros a devolver"),
-    search: Optional[str] = Query(None, description="Buscar por título")
-):
-    """
-    Obtiene la lista de comics.
-    """
-    query = db.query(Comics).join(Productos)
-    
-    # Aplicar filtros
-    if search:
-        search_term = f"%{search}%"
-        query = query.filter(Comics.titulo.like(search_term))
-    
-    return query.offset(skip).limit(limit).all()
+
 
 # Obtener un comic por ID
 @router.get("/comics/{comic_id}", response_model=ComicDetalle, summary="Obtener comic por ID")
@@ -252,28 +287,7 @@ async def get_comic(
         )
     return comic
 
-# Obtener todas las figuras
-@router.get("/figuras", response_model=List[FiguraColeccionDetalle], summary="Obtener lista de figuras")
-async def get_figuras(
-    db: Session = Depends(get_db),
-    skip: int = Query(0, description="Número de registros a omitir"),
-    limit: int = Query(100, description="Número máximo de registros a devolver"),
-    search: Optional[str] = Query(None, description="Buscar por personaje o universo")
-):
-    """
-    Obtiene la lista de figuras de colección.
-    """
-    query = db.query(FigurasColeccion).join(Productos)
-    
-    # Aplicar filtros
-    if search:
-        search_term = f"%{search}%"
-        query = query.filter(
-            (FigurasColeccion.personaje.like(search_term)) | 
-            (FigurasColeccion.universo.like(search_term))
-        )
-    
-    return query.offset(skip).limit(limit).all()
+
 
 # Obtener una figura por ID
 @router.get("/figuras/{figura_id}", response_model=FiguraColeccionDetalle, summary="Obtener figura por ID")
@@ -292,15 +306,7 @@ async def get_figura(
         )
     return figura
 
-# Obtener todas las categorías
-@router.get("/categorias", response_model=List[Categoria], summary="Obtener lista de categorías")
-async def get_categorias(
-    db: Session = Depends(get_db)
-):
-    """
-    Obtiene la lista de todas las categorías de productos.
-    """
-    return db.query(Categorias).all()
+
 
 # Crear nueva categoría
 @router.post("/categorias", response_model=Categoria, status_code=status.HTTP_201_CREATED, summary="Crear nueva categoría")
