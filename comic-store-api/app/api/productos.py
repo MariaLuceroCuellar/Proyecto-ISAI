@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query, File, UploadFile
-from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from pathlib import Path
 from ..database import get_db
 from ..models.productos import Productos, Categorias, Comics, FigurasColeccion
 from ..schemas.productos import (
@@ -18,18 +16,6 @@ import uuid
 from datetime import datetime
 
 router = APIRouter()
-
-# Ruta para servir la página HTML de productos
-@router.get("/", include_in_schema=False)
-async def serve_products_page():
-    # Ruta al archivo HTML (ajustar según la estructura del proyecto)
-    html_path = Path(__file__).parent.parent.parent.parent / "templates" / "productos.html"
-    if not html_path.exists():
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Página de productos no encontrada"
-        )
-    return FileResponse(html_path)
 
 # Obtener todos los productos
 @router.get("/", response_model=List[Producto], summary="Obtener lista de productos")
