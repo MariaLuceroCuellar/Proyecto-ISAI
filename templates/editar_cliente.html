@@ -219,77 +219,83 @@
     <div class="navbar">
         <a href="index.html" class="logo">COMICS</a>
         
-        <button class="mobile-menu-btn">☰</button>
-        
         <ul class="nav-links">
             <li><a href="{{ url_for('productos') }}">Productos</a></li>
             <li><a href="{{ url_for('empleados') }}">Empleados</a></li>
             <li><a href="{{ url_for('proveedores') }}">Proveedores</a></li>
             <li><a href="{{ url_for('clientes') }}">Clientes</a></li>
-            <li><a href="{{ url_for('inventario') }}" class="active">Inventario</a></li>
         </ul>
     </div>
 
     <div class="main-content">
-        <div class="page-title">
-            <h1>Inventario</h1>
-            <button class="add-btn">+ Agregar Movimiento</button>
-        </div>
+        <h2 class="page-title">Editar Cliente</h2>
 
-        <div class="filters-section">
-            <div class="search-bar">
-                <input type="text" class="search-input" placeholder="Buscar movimientos...">
-                <button class="search-btn">🔍</button>
-            </div>
-        </div>
-
-        <div class="table-container">
-            <table>
-                <thead>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert-container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    
+        <div class="client-details">
+            <form action="/clientes/{{ cliente.id_cliente }}/editar" method="POST">
+                <table>
                     <tr>
-                        <th>ID Movimiento</th>
-                        <th>Producto</th>
-                        <th>Tipo Movimiento</th>
-                        <th>Cantidad</th>
-                        <th>Stock Anterior</th>
-                        <th>Stock Nuevo</th>
-                        <th>Empleado</th>
-                        <th>Fecha Movimiento</th>
-                        <th>Motivo</th>
+                        <th>Nombre</th>
+                        <td><input type="text" name="nombre" value="{{ cliente.nombre }}" required></td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% if inventarios %}
-                        {% for movimiento in inventarios %}
-                            <tr>
-                                <td>{{ movimiento.id_movimiento }}</td>
-                                <td>{{ movimiento.id_producto }}</td>
-                                <td>{{ movimiento.id_tipo_movimiento }}</td>
-                                <td>{{ movimiento.cantidad }}</td>
-                                <td>{{ movimiento.stock_anterior }}</td>
-                                <td>{{ movimiento.stock_nuevo }}</td>
-                                <td>{{ movimiento.id_empleado }}</td>
-                                <td>{{ movimiento.fecha_movimiento }}</td>
-                                <td>{{ movimiento.motivo }}</td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr><td colspan="9">No hay datos de inventario.</td></tr>
-                    {% endif %}
-                </tbody>
-            </table>
-                      
+                    <tr>
+                        <th>Apellidos</th>
+                        <td><input type="text" name="apellidos" value="{{ cliente.apellidos }}" required></td>
+                    </tr>
+                    <tr>
+                        <th>Email</th>
+                        <td><input type="email" name="email" value="{{ cliente.email }}" required></td>
+                    </tr>
+                    <tr>
+                        <th>Teléfono</th>
+                        <td><input type="text" name="telefono" value="{{ cliente.telefono }}" required></td>
+                    </tr>
+                    <tr>
+                        <th>Fecha de Registro</th>
+                        <td><input type="text" name="fecha_registro" value="{{ cliente.fecha_registro }}" disabled></td>
+                    </tr>
+                    <tr>
+                        <th>Fecha de Última Compra</th>
+                        <td><input type="text" name="fecha_ultima_compra" value="{{ cliente.fecha_ultima_compra }}" disabled></td>
+                    </tr>
+                    <tr>
+                        <th>Puntos Acumulados</th>
+                        <td><input type="number" name="puntos_acumulados" value="{{ cliente.puntos_acumulados }}" required></td>
+                    </tr>
+                    <tr>
+                        <th>ID Nivel</th>
+                        <td><input type="number" name="id_nivel" value="{{ cliente.id_nivel }}" required></td>
+                    </tr>
+                    <tr>
+                        <th>ID Estatus</th>
+                        <td><input type="number" name="id_status" value="{{ cliente.id_status }}" required></td>
+                    </tr>
+                </table>
+                
+                <div class="form-buttons">
+                    <button class="add-btn" type="submit">Actualizar Cliente</button>
+                </div>
+            </form>
+            
         </div>
-
-        <div class="pagination">
-            <div class="page-item">«</div>
-            <div class="page-item active">1</div>
-            <div class="page-item">2</div>
-            <div class="page-item">3</div>
-            <div class="page-item">»</div>
+    
+        <div class="page-title">
+            <button class="add-btn" onclick="window.location.href='/clientes';" style="margin-top: 90px;">Regresa a la lista de clientes</button>
         </div>
     </div>
-
+    
+    
    
     <script>
         // Funcionalidad para el menú móvil

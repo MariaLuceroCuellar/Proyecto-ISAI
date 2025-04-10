@@ -530,9 +530,9 @@
                     <td>{{ cliente.total_compras or 0 }}</td>
                     <td>${{ cliente.total_gastado or 0.00 }}</td>
                     <td>
-                        <button class="action-btn view-btn">Ver</button>
-                        <button class="action-btn edit-btn">Editar</button>
-                        <button class="action-btn delete-btn">Eliminar</button>
+                        <a href="{{ url_for('ver_cliente', cliente_id=cliente['id_cliente']) }}" class="action-btn view-btn">Ver</a>
+                        <a href="{{ url_for('editar_cliente', id_cliente=cliente.id_cliente) }}" class="action-btn edit-btn">Editar</a>
+                        <button class="action-btn delete-btn" onclick="confirmarEliminacion({{ cliente.id_cliente }})">Eliminar</button>                    
                     </td>
                 </tr>
                 {% endfor %}
@@ -553,6 +553,37 @@
     </div>
 
     <script>
+        function confirmarEliminacion(cliente_id) {
+            var token = "{{ session['token'] }}"; // Asegúrate de que el token esté correcto.
+        
+            // Confirmación antes de eliminar
+            if (confirm("¿Estás seguro de que deseas eliminar este cliente?")) {
+                fetch(`/clientes/${cliente_id}/eliminar`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => {
+                    console.log("Response status:", response.status); // Para verificar el código de respuesta
+        
+                    if (response.status === 204) {  // Si la respuesta es 204 (sin contenido)
+                        alert('Cliente eliminado con éxito');
+                        window.location.reload();  // Recargar la página para reflejar el cambio
+                    } else {
+                        // Si la respuesta no es 204, mostrar el código de error
+                        alert(`Error al eliminar el cliente. Código de respuesta: ${response.status}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Hubo un error al eliminar el cliente');
+                });
+            }
+        }
+        
+        
         // Funcionalidad para el menú móvil
         document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
             document.querySelector('.nav-links').classList.toggle('active');

@@ -20,7 +20,6 @@ async def get_clientes(
     limit: int = Query(100, description="Número máximo de registros a devolver"),
     search: Optional[str] = Query(None, description="Buscar por nombre, apellidos o email"),
     nivel: Optional[int] = Query(None, description="Filtrar por nivel de membresía"),
-    current_user: Empleados = Depends(get_current_active_user)
 ):
     """
     Obtiene la lista de clientes con paginación y filtros opcionales.
@@ -159,29 +158,28 @@ async def update_cliente(
 
 # Eliminar un cliente (soft delete)
 @router.delete("/{cliente_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Eliminar cliente")
-async def delete_cliente(
-    cliente_id: int,
-    db: Session = Depends(get_db),
-    current_user: Empleados = Depends(get_admin_user)  # Solo administradores
-):
-    """
-    Elimina un cliente del sistema (soft delete).
-    
-    - **cliente_id**: ID del cliente a eliminar
-    """
-    # Verificar si el cliente existe
-    db_cliente = db.query(Clientes).filter(Clientes.id_cliente == cliente_id).first()
-    if db_cliente is None:
+async def delete_cliente(cliente_id: int, db: Session = Depends(get_db)):
+    cliente = db.query(Clientes).filter(Clientes.id_cliente == cliente_id).first()
+
+    if not cliente:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Cliente con ID {cliente_id} no encontrado"
+            detail="Cliente no encontrado"
         )
-    
-    # Soft delete (cambiar status a inactivo - asumiendo que 2 es "inactivo")
-    db_cliente.id_status = 2
-    db.commit()
-    
-    return None
+
+    try:
+        db.delete(cliente)
+        db.commit()  # Asegúrate de hacer commit para aplicar los cambios en la base de datos
+        return {"message": "Cliente eliminado con éxito"}  # Este mensaje no se mostrará si el status es 204
+    except Exception as e:
+        db.rollback()  # Deshacer cambios si hubo un error
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al eliminar el cliente: {str(e)}"
+        )
+
+
+
 
 # Obtener membresía de un cliente
 @router.get("/{cliente_id}/membresia", response_model=NivelMembresia, summary="Obtener membresía de cliente")
