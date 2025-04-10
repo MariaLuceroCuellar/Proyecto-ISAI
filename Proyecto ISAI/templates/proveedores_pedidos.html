@@ -1790,7 +1790,7 @@
 
         renderOrderDetails();
         updateOrderTotals();
-        closeProductModal();
+        handleCloseProductModal();
       }
 
       // Render order details
@@ -1887,6 +1887,31 @@
           return;
         }
 
+        if (!proveedor || !proveedor.email) {
+          console.error(
+            "Error: No hay dirección de correo de proveedor válida"
+          );
+          showNotification(
+            "No se pudo enviar el correo: Dirección de proveedor inválida",
+            "error"
+          );
+          return;
+        }
+
+        const emailProveedor = proveedor.email.trim();
+        if (!emailProveedor) {
+          console.error(
+            "Error: Email del proveedor está vacío después de limpiar espacios"
+          );
+          showNotification(
+            "No se pudo enviar el correo: Email inválido",
+            "error"
+          );
+          return;
+        }
+
+        console.log("Enviando correo a:", proveedor.email);
+
         // Calcular totales
         let subtotal = 0;
         detalles.forEach((detalle) => {
@@ -1904,13 +1929,29 @@
           minute: "2-digit",
         });
 
-        // Generar token de confirmación
-        const tokenConfirmacion = generarTokenConfirmacion(pedido.id_compra);
+        const asuntoConfirmacion = `CONFIRMACIÓN DE PEDIDO ${pedido.numero_compra}`;
+        const cuerpoConfirmacion = `Confirmo el pedido ${pedido.numero_compra}`;
+        const urlConfirmacion = `mailto:tiendadecomics89@gmail.com?subject=${encodeURIComponent(
+          asuntoConfirmacion
+        )}&body=${encodeURIComponent(cuerpoConfirmacion)}`;
 
-        const urlConfirmacion = `https://tu-dominio.com/confirmar-pedido.html?id=${pedido.id_compra}&token=${tokenConfirmacion}`;
-
-        // Preparar productos formateados para el template
         const productosFormateados = formatearProductosParaCorreo(detalles);
+
+        // Generar token de confirmación
+        // const tokenConfirmacion = generarTokenConfirmacion(pedido.id_compra);
+
+        // const asuntoConfirmacion = `CONFIRMACIÓN DE PEDIDO ${pedido.numero_compra}`;
+        // const cuerpoConfirmacion = `Confirmo el pedido ${pedido.numero_compra} para iniciar su procesamiento.\n\nProveedor: ${proveedor.nombre}\nFecha: ${fecha}\n\nEste es un mensaje automático de confirmación.`;
+
+        // // Codificar para URL
+        // const asuntoCodificado = encodeURIComponent(asuntoConfirmacion);
+        // const cuerpoCodificado = encodeURIComponent(cuerpoConfirmacion);
+
+        // // Crear enlace mailto
+        // const urlConfirmacion = `mailto:tiendadecomics89@gmail.com?subject=${asuntoCodificado}&body=${cuerpoCodificado}`;
+
+        // // Preparar productos formateados para el template
+        // const productosFormateados = formatearProductosParaCorreo(detalles);
 
         // Construir tabla HTML de productos para el correo
         let tablaProductos = "";
@@ -1925,34 +1966,53 @@
       `;
         });
 
-        // Parámetros para el correo
-        const params = {
-          service_id: "service_eciq4as", // Reemplaza con tu Service ID de EmailJS
-          template_id: "template_d7ek73w", // Reemplaza con tu Template ID de EmailJS
-          user_id: "uHkL4ndGHfowv1GB_", // Reemplaza con tu User ID de EmailJS
-          template_params: {
-            to_email: proveedor.email,
-            cc_email: "tiendadecomics89@gmail.com", // Para recibir una copia
-            numero_pedido: pedido.numero_compra,
-            proveedor: proveedor.nombre,
-            fecha: fecha,
-            estado: "Pendiente",
-            productos_tabla: tablaProductos,
-            subtotal: subtotal.toFixed(2),
-            iva: iva.toFixed(2),
-            total: total.toFixed(2),
-            notas: pedido.notas || "Sin notas adicionales",
-          },
-        };
+        console.log("Destinatario:", emailProveedor);
+
+        // // Parámetros para el correo
+        // const params = {
+        //   service_id: "service_eciq4as",
+        //   template_id: "template_d7ek73w",
+        //   user_id: "uHkL4ndGHfowv1GB_",
+        //   template_params: {
+        //     to_email: proveedor.email.trim(),
+        //     cc_email: "tiendadecomics89@gmail.com", // Para recibir una copia
+        //     numero_pedido: pedido.numero_compra,
+        //     proveedor: proveedor.nombre,
+        //     fecha: fecha,
+        //     estado: "Pendiente",
+        //     productos_tabla: tablaProductos,
+        //     subtotal: subtotal.toFixed(2),
+        //     iva: iva.toFixed(2),
+        //     total: total.toFixed(2),
+        //     notas: pedido.notas || "Sin notas adicionales",
+        //     confirmar_url: urlConfirmacion,
+        //   },
+        // };
+
+        // console.log("Enviando correo con parámetros:", params);
 
         // Enviar correo con EmailJS
         emailjs
           .send(
-            params.service_id,
-            params.template_id,
-            params.template_params,
-            params.user_id
+            "service_eciq4as",
+            "template_d7ek73w",
+            {
+              to_email: proveedor.email.trim(),
+              cc_email: "tiendadecomics89@gmail.com",
+              numero_pedido: pedido.numero_compra,
+              proveedor: proveedor.nombre,
+              fecha: fecha,
+              estado: "Pendiente",
+              productos_tabla: tablaProductos,
+              subtotal: subtotal.toFixed(2),
+              iva: iva.toFixed(2),
+              total: total.toFixed(2),
+              notas: pedido.notas || "Sin notas adicionales",
+              confirmar_url: urlConfirmacion,
+            },
+            "uHkL4ndGHfowv1GB_"
           )
+
           .then(function (response) {
             console.log("Correo enviado exitosamente:", response);
             showNotification(
@@ -1963,6 +2023,8 @@
           .catch(function (error) {
             console.error("Error al enviar correo:", error);
             showNotification("Error al enviar correo de confirmación", "error");
+
+            console.log("Intentando envío alternativo...");
           });
       }
       // Save order
