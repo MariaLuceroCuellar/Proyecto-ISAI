@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     PROJECT_VERSION: str = "1.0.0"
     
     # Database
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "mysql+pymysql://root:root@localhost/comicstore")
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "mysql+pymysql://root@localhost/ComicStore")
     
     # JWT
     SECRET_KEY: str = os.getenv("SECRET_KEY", "admin")
