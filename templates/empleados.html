@@ -445,464 +445,630 @@
     </style>
 </head>
 <body>
-<header>
-    <div class="logo">COMICS</div>
-    <nav>
-        <ul class="nav-links">
-            <li><a href="/productos">Productos</a></li>
-            <li><a href="/empleados">Empleados</a></li>
-            <li><a href="/proveedores">Proveedores</a></li>
-            <li><a href="/clientes">Clientes</a></li>
-        </ul>
-    </nav>
-</header>
+    <header>
+        <div class="logo">COMICS</div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="/productos">Productos</a></li>
+                <li><a href="/empleados">Empleados</a></li>
+                <li><a href="/proveedores">Proveedores</a></li>
+                <li><a href="/clientes">Clientes</a></li>
+            </ul>
+        </nav>
+    </header>
 
-<div class="container">
-    <!-- Mensajes flash -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <div class="flash-messages">
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">
-            {{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    {% endwith %}
-
-    <div class="table-header">
-        <h2 class="section-title">Empleados</h2>
-        <button onclick="mostrarModalNuevo()" class="add-employee-btn">+ Añadir empleado</button>
-    </div>
-
-    <form action="/empleados" method="get">
-        <div class="filters">
-            <div class="filter-group">
-                <select id="roleFilter" name="role" onchange="this.form.submit()">
-                    <option value="">Todos los roles</option>
-                    {% if roles %}
-                    {% for rol in roles %}
-                    <option value="{{ rol.id_rol }}" {% if role== rol.id_rol|string %}selected{% endif %}>
-                        {{ rol.nombre_rol|title }}
-                    </option>
-                    {% endfor %}
-                    {% endif %}
-                </select>
-            </div>
-            <div class="filter-group">
-                <select id="statusFilter" name="status" onchange="this.form.submit()">
-                    <option value="">Todos los estados</option>
-                    <option value="1" {% if status==
-                    '1' %}selected{% endif %}>Activo</option>
-                    <option value="2" {% if status==
-                    '2' %}selected{% endif %}>Inactivo</option>
-                </select>
-            </div>
-            <div class="filter-group search-box">
-                <input type="text" placeholder="Buscar empleado..." class="search-input"
-                       id="searchInput" name="search" value="{{ search }}">
-                <button type="submit" class="search-btn">🔍</button>
-            </div>
-        </div>
-    </form>
-
-    {% if error %}
-    <div class="alert alert-error">
-        {{ error }}
-    </div>
-    {% endif %}
-
-    <div class="employees-table">
-        <table>
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Empleado</th>
-                <th>Email</th>
-                <th>Teléfono</th>
-                <th>ID Puesto</th>
-                <th>Estado</th>
-                <th>Usuario</th>
-                <th>Fecha contratación</th>
-                <th>Acciones</th>
-            </tr>
-            </thead>
-            <tbody id="employeesTableBody">
-            {% if empleados %}
-            {% for empleado in empleados %}
-            <tr>
-                <td>{{ empleado.id_empleado }}</td>
-                <td>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div class="employee-avatar">
-                            {{ empleado.nombre[0] }}{{ empleado.apellidos[0] if empleado.apellidos else '' }}
+    <div class="container">
+        <!-- Mensajes flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
                         </div>
-                        <span class="employee-name">{{ empleado.nombre }} {{ empleado.apellidos }}</span>
-                    </div>
-                </td>
-                <td>{{ empleado.email }}</td>
-                <td>{{ empleado.telefono or 'No disponible' }}</td>
-                <td>{{ empleado.id_puesto }}</td>
-                <td>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="table-header">
+            <h2 class="section-title">Empleados</h2>
+            <button onclick="mostrarModalNuevo()" class="add-employee-btn">+ Añadir empleado</button>
+        </div>
+
+        <form action="/empleados" method="get">
+            <div class="filters">
+                <div class="filter-group search-box">
+                    <input type="text" placeholder="Buscar empleado..." class="search-input"
+                           id="searchInput" name="search" value="{{ search }}">
+                    <button type="submit" class="search-btn">🔍</button>
+                </div>
+            </div>
+        </form>
+
+        {% if error %}
+        <div class="alert alert-error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <div class="employees-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Empleado</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>ID Puesto</th>
+                        <th>Estado</th>
+                        <th>Usuario</th>
+                        <th>Fecha contratación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="employeesTableBody">
+                    {% if empleados %}
+                        {% for empleado in empleados %}
+                        <tr>
+                            <td>{{ empleado.id_empleado }}</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="employee-avatar">
+                                        {{ empleado.nombre[0] }}{{ empleado.apellidos[0] if empleado.apellidos else '' }}
+                                    </div>
+                                    <span class="employee-name">{{ empleado.nombre }} {{ empleado.apellidos }}</span>
+                                </div>
+                            </td>
+                            <td>{{ empleado.email }}</td>
+                            <td>{{ empleado.telefono or 'No disponible' }}</td>
+                            <td>{{ empleado.id_puesto }}</td>
+                            <td>
                                 <span class="status-tag {% if empleado.id_status == 1 %}status-active{% else %}status-inactive{% endif %}">
                                     {{ 'Activo' if empleado.id_status == 1 else 'Inactivo' }}
                                 </span>
-                </td>
-                <td>{{ empleado.nombre_usuario }}</td>
-                <td>
-                    {% if empleado.fecha_contratacion %}
-                    {{ empleado.fecha_contratacion }}
+                            </td>
+                            <td>{{ empleado.nombre_usuario }}</td>
+                            <td>
+                                {% if empleado.fecha_contratacion %}
+                                    {{ empleado.fecha_contratacion }}
+                                {% else %}
+                                    No disponible
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button onclick='verEmpleado({{ empleado|tojson|safe }})' class="action-btn view-btn">Ver</button>
+                                <button type="button" onclick='editarEmpleado({{ empleado|tojson|safe }})' class="action-btn edit-btn">Editar</button>
+                                <button class="action-btn delete-btn" onclick="confirmarEliminar({{ empleado.id_empleado }})">Eliminar</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
                     {% else %}
-                    No disponible
+                        <tr><td colspan="9">No hay empleados registrados.</td></tr>
                     {% endif %}
-                </td>
-                <td>
-                    <button onclick='verEmpleado({{ empleado|tojson|safe }})' class="action-btn view-btn">Ver</button>
-                    <button onclick='editarEmpleado({{ empleado|tojson|safe }})' class="action-btn edit-btn">Editar
-                    </button>
-                    <button class="action-btn delete-btn" onclick="confirmarEliminar({{ empleado.id_empleado }})">
-                        Eliminar
-                    </button>
-                </td>
-            </tr>
-            {% endfor %}
-            {% else %}
-            <tr>
-                <td colspan="9">No hay empleados registrados.</td>
-            </tr>
-            {% endif %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="pagination">
-        {% if page > 1 %}
-        <a href="/empleados?page={{ page - 1 }}&search={{ search }}&role={{ role }}&status={{ status }}"
-           class="pagination-btn">Anterior</a>
-        {% else %}
-        <button class="pagination-btn" disabled>Anterior</button>
-        {% endif %}
-
-        <span class="pagination-btn active">{{ page }}</span>
-
-        <a href="/empleados?page={{ page + 1 }}&search={{ search }}&role={{ role }}&status={{ status }}"
-           class="pagination-btn">Siguiente</a>
-    </div>
-</div>
-
-<!-- Modal para confirmar eliminación -->
-<div class="modal" id="deleteModal">
-    <div class="modal-content" style="max-width: 400px;">
-        <div class="modal-header">
-            <h3 class="modal-title">Confirmar eliminación</h3>
-            <button class="close-modal" onclick="cerrarModal('deleteModal')">×</button>
+                </tbody>
+            </table>
         </div>
-        <p style="margin-bottom: 20px;">¿Está seguro de que desea eliminar este empleado? Esta acción no se puede
-            deshacer.</p>
-        <div style="display: flex; gap: 10px; justify-content: flex-end;">
-            <button onclick="cerrarModal('deleteModal')" class="btn btn-secondary">Cancelar</button>
-            <form id="deleteForm" method="post" action="">
-                <button type="submit" class="btn btn-primary" style="background-color: #f44336;">Eliminar</button>
+
+        <div class="pagination">
+            {% if page > 1 %}
+                <a href="/empleados?page={{ page - 1 }}&search={{ search }}"
+                   class="pagination-btn">Anterior</a>
+            {% else %}
+                <button class="pagination-btn" disabled>Anterior</button>
+            {% endif %}
+
+            <span class="pagination-btn active">{{ page }}</span>
+
+            <a href="/empleados?page={{ page + 1 }}&search={{ search }}"
+               class="pagination-btn">Siguiente</a>
+        </div>
+    </div>
+
+    <!-- Modal para confirmar eliminación -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirmar eliminación</h3>
+                <button class="close-modal" onclick="cerrarModal('deleteModal')">×</button>
+            </div>
+            <p style="margin-bottom: 20px;">¿Está seguro de que desea eliminar este empleado? Esta acción no se puede deshacer.</p>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="cerrarModal('deleteModal')" class="btn btn-secondary">Cancelar</button>
+                <form id="deleteForm" method="post" action="">
+                    <button type="submit" class="btn btn-primary" style="background-color: #f44336;">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para ver detalles del empleado -->
+    <div class="modal" id="viewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Detalles del Empleado</h3>
+                <button class="close-modal" onclick="cerrarModal('viewModal')">×</button>
+            </div>
+            <div class="employee-details">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div class="employee-avatar avatar-large" style="margin: 0 auto; display: flex;">
+                        <span id="viewInitials"></span>
+                    </div>
+                    <h2 id="viewFullName" style="margin-top: 10px;"></h2>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">ID:</div>
+                    <div class="detail-value" id="viewId"></div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Email:</div>
+                    <div class="detail-value" id="viewEmail"></div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Teléfono:</div>
+                    <div class="detail-value" id="viewTelefono"></div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">ID Puesto:</div>
+                    <div class="detail-value" id="viewPuesto"></div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Estado:</div>
+                    <div class="detail-value" id="viewEstado"></div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Nombre de usuario:</div>
+                    <div class="detail-value" id="viewNombreUsuario"></div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Fecha contratación:</div>
+                    <div class="detail-value" id="viewFechaContratacion"></div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Fecha nacimiento:</div>
+                    <div class="detail-value" id="viewFechaNacimiento"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cerrarModal('viewModal')">Cerrar</button>
+                <button class="btn btn-primary" id="btnEditarDesdeDetalle">Editar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar empleado -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="editModalTitle">Editar Empleado</h3>
+                <button class="close-modal" onclick="cerrarModal('editModal')">×</button>
+            </div>
+            <form id="empleadoForm" method="post" onsubmit="return validarYEnviarFormulario()">
+                <input type="hidden" id="id_empleado" name="id_empleado">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombre" class="required">Nombre</label>
+                        <input type="text" id="nombre" name="nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="apellidos" class="required">Apellidos</label>
+                        <input type="text" id="apellidos" name="apellidos" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="required">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="telefono">Teléfono</label>
+                        <input type="tel" id="telefono" name="telefono">
+                    </div>
+                    <div class="form-group">
+                        <label for="id_puesto" class="required">ID Puesto</label>
+                        <input type="number" id="id_puesto" name="id_puesto" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_status" class="required">Estado</label>
+                        <select id="id_status" name="id_status" required>
+                            <option value="1">Activo</option>
+                            <option value="2">Inactivo</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="nombreUsuarioGroup">
+                        <label for="nombre_usuario" class="required">Nombre de usuario</label>
+                        <input type="text" id="nombre_usuario" name="nombre_usuario">
+                    </div>
+                </div>
+
+                <div class="form-row" id="passwordGroup">
+                    <div class="form-group">
+                        <label for="password" class="required">Contraseña</label>
+                        <input type="password" id="password" name="password">
+                    </div>
+                    <div class="form-group"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fecha_contratacion">Fecha de contratación</label>
+                        <input type="date" id="fecha_contratacion" name="fecha_contratacion">
+                    </div>
+                    <div class="form-group">
+                        <label for="fecha_nacimiento">Fecha de nacimiento</label>
+                        <input type="date" id="fecha_nacimiento" name="fecha_nacimiento">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModal('editModal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnGuardar">Guardar</button>
+                </div>
             </form>
         </div>
     </div>
-</div>
 
-<!-- Modal para ver detalles del empleado -->
-<div class="modal" id="viewModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 class="modal-title">Detalles del Empleado</h3>
-            <button class="close-modal" onclick="cerrarModal('viewModal')">×</button>
-        </div>
-        <div class="employee-details">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <div class="employee-avatar avatar-large" style="margin: 0 auto; display: flex;">
-                    <span id="viewInitials"></span>
-                </div>
-                <h2 id="viewFullName" style="margin-top: 10px;"></h2>
-            </div>
+    <script>
+        // Función para validar y enviar el formulario
+        function validarYEnviarFormulario() {
+            try {
+                console.log("Validando formulario...");
+                const form = document.getElementById('empleadoForm');
+                const isNewEmployee = form.action.includes('/empleados/nuevo');
+                const btnGuardar = document.getElementById('btnGuardar');
 
-            <div class="detail-item">
-                <div class="detail-label">Email:</div>
-                <div class="detail-value" id="viewEmail"></div>
-            </div>
+                // Desactivar el botón para prevenir múltiples envíos
+                if (btnGuardar) {
+                    btnGuardar.disabled = true;
+                    btnGuardar.innerText = "Guardando...";
+                }
 
-            <div class="detail-item">
-                <div class="detail-label">Teléfono:</div>
-                <div class="detail-value" id="viewTelefono"></div>
-            </div>
+                // Validar y preparar datos para el formulario según sea nuevo o edición
+                if (isNewEmployee) {
+                    // Para nuevo empleado, requerir nombre de usuario y contraseña
+                    document.getElementById('nombre_usuario').setAttribute('required', 'required');
+                    document.getElementById('password').setAttribute('required', 'required');
 
-            <div class="detail-item">
-                <div class="detail-label">Puesto:</div>
-                <div class="detail-value" id="viewPuesto"></div>
-            </div>
+                    if (!document.getElementById('nombre_usuario').value || !document.getElementById('password').value) {
+                        alert("El nombre de usuario y contraseña son obligatorios para nuevos empleados");
+                        if (btnGuardar) {
+                            btnGuardar.disabled = false;
+                            btnGuardar.innerText = "Guardar";
+                        }
+                        return false;
+                    }
+                } else {
+                    // Para edición, quitar requerimiento de usuario y contraseña
+                    document.getElementById('nombre_usuario').removeAttribute('required');
+                    document.getElementById('password').removeAttribute('required');
+                }
 
-            <div class="detail-item">
-                <div class="detail-label">Rol:</div>
-                <div class="detail-value" id="viewRol"></div>
-            </div>
+                // Convertir campos numéricos a números
+                const idPuestoEl = document.getElementById('id_puesto');
+                const idStatusEl = document.getElementById('id_status');
 
-            <div class="detail-item">
-                <div class="detail-label">Estado:</div>
-                <div class="detail-value" id="viewEstado"></div>
-            </div>
+                if (idPuestoEl && idPuestoEl.value) {
+                    idPuestoEl.value = parseInt(idPuestoEl.value);
+                }
 
-            <div class="detail-item">
-                <div class="detail-label">Fecha contratación:</div>
-                <div class="detail-value" id="viewFechaContratacion"></div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="cerrarModal('viewModal')">Cerrar</button>
-            <button class="btn btn-primary" id="btnEditarDesdeDetalle">Editar</button>
-        </div>
-    </div>
-</div>
+                if (idStatusEl && idStatusEl.value) {
+                    idStatusEl.value = parseInt(idStatusEl.value);
+                }
 
-<!-- Modal para editar empleado -->
-<div class="modal" id="editModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 class="modal-title" id="editModalTitle">Editar Empleado</h3>
-            <button class="close-modal" onclick="cerrarModal('editModal')">×</button>
-        </div>
-        <form id="empleadoForm" method="post" onsubmit="return validarYEnviarFormulario()">
-            <input type="hidden" id="id_empleado" name="id_empleado">
+                // Verificar campos obligatorios generales
+                if (!document.getElementById('nombre').value ||
+                    !document.getElementById('apellidos').value ||
+                    !document.getElementById('email').value ||
+                    !document.getElementById('id_puesto').value ||
+                    !document.getElementById('id_status').value) {
+                    alert("Por favor completa todos los campos obligatorios");
+                    if (btnGuardar) {
+                        btnGuardar.disabled = false;
+                        btnGuardar.innerText = "Guardar";
+                    }
+                    return false;
+                }
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="nombre" class="required">Nombre</label>
-                    <input type="text" id="nombre" name="nombre" required>
-                </div>
-                <div class="form-group">
-                    <label for="apellidos" class="required">Apellidos</label>
-                    <input type="text" id="apellidos" name="apellidos" required>
-                </div>
-            </div>
+                // Mostrar los datos que se van a enviar para depuración
+                const formData = new FormData(form);
+                console.log("Datos a enviar:");
+                for (let pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
 
-            <div class="form-group">
-                <label for="email" class="required">Email</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="telefono">Teléfono</label>
-                    <input type="tel" id="telefono" name="telefono">
-                </div>
-                <div class="form-group">
-                    <label for="id_puesto" class="required">ID Puesto</label>
-                    <input type="number" id="id_puesto" name="id_puesto" required>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="id_status" class="required">Estado</label>
-                    <select id="id_status" name="id_status" required>
-                        <option value="1">Activo</option>
-                        <option value="2">Inactivo</option>
-                    </select>
-                </div>
-                <div class="form-group" id="nombreUsuarioGroup">
-                    <label for="nombre_usuario" class="required">Nombre de usuario</label>
-                    <input type="text" id="nombre_usuario" name="nombre_usuario">
-                </div>
-            </div>
-
-            <div class="form-row" id="passwordGroup">
-                <div class="form-group">
-                    <label for="password" class="required">Contraseña</label>
-                    <input type="password" id="password" name="password">
-                </div>
-                <div class="form-group"></div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="fecha_contratacion">Fecha de contratación</label>
-                    <input type="date" id="fecha_contratacion" name="fecha_contratacion">
-                </div>
-                <div class="form-group">
-                    <label for="fecha_nacimiento">Fecha de nacimiento</label>
-                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento">
-                </div>
-            </div>
-
-            <div class="modal-footer">j
-                <button type="button" class="btn btn-secondary" onclick="cerrarModal('editModal')">Cancelar</button>
-                <button type="submit" class="btn btn-primary" id="btnGuardar">Guardar</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script>
-    // Función para preparar el formulario antes de enviar
-    function prepararFormulario() {
-        console.log("Preparando formulario para envío...");
-        const form = document.getElementById('empleadoForm');
-        const isNewEmployee = form.action.includes('/empleados/nuevo');
-
-        // Si estamos en modo edición, asegúrate de que los campos obligatorios para edición estén presentes
-        if (!isNewEmployee) {
-            // Asegúrate de que id_status sea un número
-            const idStatusEl = document.getElementById('id_status');
-            if (idStatusEl && idStatusEl.value) {
-                idStatusEl.value = parseInt(idStatusEl.value);
-            }
-
-            // Asegúrate de que id_puesto sea un número
-            const idPuestoEl = document.getElementById('id_puesto');
-            if (idPuestoEl && idPuestoEl.value) {
-                idPuestoEl.value = parseInt(idPuestoEl.value);
-            }
-
-            // Verifica que al menos se envíen los campos obligatorios
-            if (!document.getElementById('nombre').value ||
-                !document.getElementById('apellidos').value ||
-                !document.getElementById('email').value ||
-                !document.getElementById('id_puesto').value) {
-                alert("Por favor completa todos los campos obligatorios");
+                // Permitir el envío del formulario
+                console.log("Formulario validado con éxito, enviando datos...");
+                return true;
+            } catch (error) {
+                console.error("Error al validar formulario:", error);
+                const btnGuardar = document.getElementById('btnGuardar');
+                if (btnGuardar) {
+                    btnGuardar.disabled = false;
+                    btnGuardar.innerText = "Guardar";
+                }
                 return false;
             }
         }
 
-        // Imprime los datos que se van a enviar para depuración
-        const formData = new FormData(form);
-        console.log("Datos a enviar:");
-        for (let pair of formData.entries()) {
-            console.log(pair[0] + ': ' + pair[1]);
+        // Modal de confirmación de eliminación
+        function confirmarEliminar(empleadoId) {
+            const modal = document.getElementById('deleteModal');
+            const form = document.getElementById('deleteForm');
+
+            form.action = `/empleados/eliminar/${empleadoId}`;
+            modal.style.display = 'flex';
         }
 
-        return true;
-    }
-
-    // Modal de confirmación de eliminación
-    function confirmarEliminar(empleadoId) {
-        const modal = document.getElementById('deleteModal');
-        const form = document.getElementById('deleteForm');
-
-        form.action = `/empleados/eliminar/${empleadoId}`;
-        modal.style.display = 'flex';
-    }
-
-    // Cerrar un modal específico por su ID
-    function cerrarModal(modalId) {
-        const modal = document.getElementById(modalId);
-        modal.style.display = 'none';
-    }
-
-    // Cerrar modales al hacer clic fuera
-    window.onclick = function (event) {
-        const modales = document.getElementsByClassName('modal');
-        for (let i = 0; i < modales.length; i++) {
-            if (event.target === modales[i]) {
-                modales[i].style.display = 'none';
-            }
+        // Cerrar un modal específico por su ID
+        function cerrarModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'none';
         }
-    };
 
-    // Mostrar modal para ver detalles de empleado
-    function verEmpleado(empleado) {
-        console.log("Ver empleado:", empleado);
-        const modal = document.getElementById('viewModal');
-
-        // Llenar datos en el modal
-        document.getElementById('viewInitials').textContent = empleado.nombre[0] + (empleado.apellidos ? empleado.apellidos[0] : '');
-        document.getElementById('viewFullName').textContent = empleado.nombre + ' ' + empleado.apellidos;
-        document.getElementById('viewEmail').textContent = empleado.email;
-        document.getElementById('viewTelefono').textContent = empleado.telefono || 'No disponible';
-        document.getElementById('viewPuesto').textContent = empleado.puesto;
-        document.getElementById('viewRol').textContent = empleado.rol || 'Desconocido';
-
-        // Estado con formato
-        const estadoEl = document.getElementById('viewEstado');
-        estadoEl.textContent = empleado.id_status === 1 ? 'Activo' : 'Inactivo';
-        estadoEl.className = empleado.id_status === 1 ? 'status-tag status-active' : 'status-tag status-inactive';
-
-        document.getElementById('viewFechaContratacion').textContent = empleado.fecha_contratacion || 'No disponible';
-
-        // Configurar botón para editar desde detalles
-        document.getElementById('btnEditarDesdeDetalle').onclick = function () {
-            cerrarModal('viewModal');
-            editarEmpleado(empleado);
-        };
-
-        // Mostrar modal
-        modal.style.display = 'flex';
-    }
-
-    // Mostrar modal para editar empleado
-    function editarEmpleado(empleado) {
-        console.log("Editar empleado:", empleado);
-        const modal = document.getElementById('editModal');
-        const form = document.getElementById('empleadoForm');
-
-        // Configurar título del modal y URL del formulario
-        document.getElementById('editModalTitle').textContent = 'Editar Empleado';
-        form.action = `/empleados/editar/${empleado.id_empleado}`;
-
-        // Llenar el formulario con los datos del empleado
-        document.getElementById('id_empleado').value = empleado.id_empleado;
-        document.getElementById('nombre').value = empleado.nombre || '';
-        document.getElementById('apellidos').value = empleado.apellidos || '';
-        document.getElementById('email').value = empleado.email || '';
-        document.getElementById('telefono').value = empleado.telefono || '';
-        document.getElementById('puesto').value = empleado.puesto || '';
-
-        // Establecer valores de selección
-        const rolSelect = document.getElementById('id_rol');
-        if (empleado.id_rol) {
-            // Buscar si existe la opción
-            for (let i = 0; i < rolSelect.options.length; i++) {
-                if (rolSelect.options[i].value == empleado.id_rol) {
-                    rolSelect.selectedIndex = i;
-                    break;
+        // Cerrar modales al hacer clic fuera
+        window.onclick = function(event) {
+            const modales = document.getElementsByClassName('modal');
+            for (let i = 0; i < modales.length; i++) {
+                if (event.target === modales[i]) {
+                    modales[i].style.display = 'none';
                 }
             }
+        };
+
+        // Mostrar modal para ver detalles de empleado
+        function verEmpleado(empleado) {
+            console.log("Ver empleado:", empleado);
+            const modal = document.getElementById('viewModal');
+
+            // Llenar datos en el modal
+            document.getElementById('viewInitials').textContent = empleado.nombre[0] + (empleado.apellidos ? empleado.apellidos[0] : '');
+            document.getElementById('viewFullName').textContent = empleado.nombre + ' ' + empleado.apellidos;
+            document.getElementById('viewId').textContent = empleado.id_empleado;
+            document.getElementById('viewEmail').textContent = empleado.email;
+            document.getElementById('viewTelefono').textContent = empleado.telefono || 'No disponible';
+            document.getElementById('viewPuesto').textContent = empleado.id_puesto || 'No disponible';
+
+            // Estado con formato
+            const estadoEl = document.getElementById('viewEstado');
+            estadoEl.textContent = empleado.id_status === 1 ? 'Activo' : 'Inactivo';
+            estadoEl.className = empleado.id_status === 1 ? 'status-tag status-active' : 'status-tag status-inactive';
+
+            document.getElementById('viewNombreUsuario').textContent = empleado.nombre_usuario || 'No disponible';
+            document.getElementById('viewFechaContratacion').textContent = empleado.fecha_contratacion || 'No disponible';
+            document.getElementById('viewFechaNacimiento').textContent = empleado.fecha_nacimiento || 'No disponible';
+
+            // Configurar botón para editar desde detalles
+            document.getElementById('btnEditarDesdeDetalle').onclick = function() {
+                cerrarModal('viewModal');
+                editarEmpleado(empleado);
+            };
+
+            // Mostrar modal
+            modal.style.display = 'flex';
         }
 
-        document.getElementById('id_status').value = empleado.id_status || 1;
+        // Mostrar modal para editar empleado
+        function editarEmpleado(empleado) {
+            // Depuración completa de los datos recibidos
+            console.log("------ EDITAR EMPLEADO ------");
+            console.log("Datos recibidos:", JSON.stringify(empleado, null, 2));
 
-        // Formatear fecha para el input date si existe
-        if (empleado.fecha_contratacion) {
-            // Asumiendo que la fecha viene en formato 'DD/MM/YYYY' o similar
-            // Convertir a formato 'YYYY-MM-DD' para el input date
-            let fechaPartes = empleado.fecha_contratacion.split('/');
-            if (fechaPartes.length === 3) {
-                document.getElementById('fecha_contratacion').value =
-                    `${fechaPartes[2]}-${fechaPartes[1].padStart(2, '0')}-${fechaPartes[0].padStart(2, '0')}`;
-            } else {
-                // Si ya viene en formato ISO o YYYY-MM-DD
-                document.getElementById('fecha_contratacion').value = empleado.fecha_contratacion;
+            try {
+                const modal = document.getElementById('editModal');
+                const form = document.getElementById('empleadoForm');
+
+                // Verificar que el modal y el formulario existen
+                if (!modal || !form) {
+                    console.error("No se encontró el modal o el formulario");
+                    return;
+                }
+
+                console.log("Configurando formulario para edición...");
+
+                // Configurar título del modal y URL del formulario
+                const titleEl = document.getElementById('editModalTitle');
+                if (titleEl) {
+                    titleEl.textContent = 'Editar Empleado';
+                }
+
+                // Configurar la acción del formulario
+                form.action = `/empleados/editar/${empleado.id_empleado}`;
+                console.log("URL del formulario configurada:", form.action);
+
+                // Asegúrate de que los valores numéricos sean de tipo número
+                const idEmpleado = typeof empleado.id_empleado === 'string' ?
+                    parseInt(empleado.id_empleado) : empleado.id_empleado;
+                const idPuesto = typeof empleado.id_puesto === 'string' ?
+                    parseInt(empleado.id_puesto) : empleado.id_puesto;
+                const idStatus = typeof empleado.id_status === 'string' ?
+                    parseInt(empleado.id_status) : empleado.id_status;
+
+                console.log("Valores convertidos:", {
+                    idEmpleado: idEmpleado,
+                    idPuesto: idPuesto,
+                    idStatus: idStatus
+                });
+
+                // Llenar el formulario con los datos del empleado
+                const camposFormulario = {
+                    'id_empleado': idEmpleado,
+                    'nombre': empleado.nombre || '',
+                    'apellidos': empleado.apellidos || '',
+                    'email': empleado.email || '',
+                    'telefono': empleado.telefono || '',
+                    'id_puesto': idPuesto || '',
+                    'id_status': idStatus === undefined || idStatus === null ? 1 : idStatus
+                };
+
+                console.log("Valores a colocar en el formulario:", camposFormulario);
+
+                // Asignar valores a los campos del formulario
+                for (const [id, valor] of Object.entries(camposFormulario)) {
+                    const campo = document.getElementById(id);
+                    if (campo) {
+                        campo.value = valor;
+                        console.log(`Campo ${id} establecido a: ${valor}`);
+                    } else {
+                        console.warn(`No se encontró el campo con ID: ${id}`);
+                    }
+                }
+
+                // Ocultar los campos de nombre_usuario y password (solo necesarios para nuevo empleado)
+                const usuarioGroup = document.getElementById('nombreUsuarioGroup');
+                const passwordGroup = document.getElementById('passwordGroup');
+
+                if (usuarioGroup) usuarioGroup.style.display = 'none';
+                if (passwordGroup) passwordGroup.style.display = 'none';
+
+                // Eliminar la validación required para campos que no se usarán en edición
+                const usuarioInput = document.getElementById('nombre_usuario');
+                const passwordInput = document.getElementById('password');
+
+                if (usuarioInput) usuarioInput.removeAttribute('required');
+                if (passwordInput) passwordInput.removeAttribute('required');
+
+                // Formatear fecha para el input date si existe
+                if (empleado.fecha_contratacion) {
+                    try {
+                        // Comprobar diferentes formatos de fecha
+                        let fechaFormateada = '';
+                        if (empleado.fecha_contratacion.includes('/')) {
+                            // Formato DD/MM/YYYY
+                            let fechaPartes = empleado.fecha_contratacion.split('/');
+                            if (fechaPartes.length === 3) {
+                                fechaFormateada = `${fechaPartes[2]}-${fechaPartes[1].padStart(2, '0')}-${fechaPartes[0].padStart(2, '0')}`;
+                            }
+                        } else if (empleado.fecha_contratacion.includes('-')) {
+                            // Ya podría estar en formato YYYY-MM-DD, comprobar
+                            const fechaPartes = empleado.fecha_contratacion.split('-');
+                            if (fechaPartes.length === 3 && fechaPartes[0].length === 4) {
+                                // Ya está en formato YYYY-MM-DD
+                                fechaFormateada = empleado.fecha_contratacion;
+                            } else if (fechaPartes.length === 3) {
+                                // Podría ser DD-MM-YYYY
+                                fechaFormateada = `${fechaPartes[2]}-${fechaPartes[1].padStart(2, '0')}-${fechaPartes[0].padStart(2, '0')}`;
+                            }
+                        }
+
+                        const fechaContratacionEl = document.getElementById('fecha_contratacion');
+                        if (fechaContratacionEl) {
+                            fechaContratacionEl.value = fechaFormateada;
+                            console.log("Fecha contratación formateada:", fechaFormateada);
+                        }
+                    } catch (e) {
+                        console.error("Error al formatear fecha_contratacion:", e);
+                        const fechaContratacionEl = document.getElementById('fecha_contratacion');
+                        if (fechaContratacionEl) fechaContratacionEl.value = '';
+                    }
+                } else {
+                    const fechaContratacionEl = document.getElementById('fecha_contratacion');
+                    if (fechaContratacionEl) fechaContratacionEl.value = '';
+                }
+
+                // Formatear fecha de nacimiento - mismo proceso
+                if (empleado.fecha_nacimiento) {
+                    try {
+                        let fechaFormateada = '';
+                        if (empleado.fecha_nacimiento.includes('/')) {
+                            let fechaPartes = empleado.fecha_nacimiento.split('/');
+                            if (fechaPartes.length === 3) {
+                                fechaFormateada = `${fechaPartes[2]}-${fechaPartes[1].padStart(2, '0')}-${fechaPartes[0].padStart(2, '0')}`;
+                            }
+                        } else if (empleado.fecha_nacimiento.includes('-')) {
+                            const fechaPartes = empleado.fecha_nacimiento.split('-');
+                            if (fechaPartes.length === 3 && fechaPartes[0].length === 4) {
+                                fechaFormateada = empleado.fecha_nacimiento;
+                            } else if (fechaPartes.length === 3) {
+                                fechaFormateada = `${fechaPartes[2]}-${fechaPartes[1].padStart(2, '0')}-${fechaPartes[0].padStart(2, '0')}`;
+                            }
+                        }
+
+                        const fechaNacimientoEl = document.getElementById('fecha_nacimiento');
+                        if (fechaNacimientoEl) {
+                            fechaNacimientoEl.value = fechaFormateada;
+                            console.log("Fecha nacimiento formateada:", fechaFormateada);
+                        }
+                    } catch (e) {
+                        console.error("Error al formatear fecha_nacimiento:", e);
+                        const fechaNacimientoEl = document.getElementById('fecha_nacimiento');
+                        if (fechaNacimientoEl) fechaNacimientoEl.value = '';
+                    }
+                } else {
+                    const fechaNacimientoEl = document.getElementById('fecha_nacimiento');
+                    if (fechaNacimientoEl) fechaNacimientoEl.value = '';
+                }
+
+                // Restablecer estado del botón
+                const btnGuardar = document.getElementById('btnGuardar');
+                if (btnGuardar) {
+                    btnGuardar.disabled = false;
+                    btnGuardar.innerText = "Guardar";
+                }
+
+                console.log("Mostrando modal de edición...");
+
+                // Mostrar modal
+                modal.style.display = 'flex';
+                console.log("Modal mostrado con éxito");
+            } catch (error) {
+                console.error("Error al preparar formulario de edición:", error);
+                alert("Ocurrió un error al cargar los datos del empleado: " + error.message);
             }
-        } else {
-            document.getElementById('fecha_contratacion').value = '';
         }
 
-        // Mostrar modal
-        modal.style.display = 'flex';
-    }
+        // Mostrar modal para nuevo empleado
+        function mostrarModalNuevo() {
+            try {
+                const modal = document.getElementById('editModal');
+                const form = document.getElementById('empleadoForm');
 
-    // Mostrar modal para nuevo empleado
-    function mostrarModalNuevo() {
-        const modal = document.getElementById('editModal');
-        const form = document.getElementById('empleadoForm');
+                // Configurar título del modal y URL del formulario
+                document.getElementById('editModalTitle').textContent = 'Nuevo Empleado';
+                form.action = '/empleados/nuevo';
 
-        // Configurar título del modal y URL del formulario
-        document.getElementById('editModalTitle').textContent = 'Nuevo Empleado';
-        form.action = '/empleados/nuevo';
+                // Limpiar formulario
+                form.reset();
+                document.getElementById('id_empleado').value = '';
 
-        // Limpiar formulario
-        form.reset();
-        document.getElementById('id_empleado').value = '';
+                // Establecer valores predeterminados
+                document.getElementById('id_status').value = "1";  // Activo por defecto
 
-        // Mostrar modal
-        modal.style.display = 'flex';
-    }
-</script>
+                // Mostrar los campos de nombre_usuario y password (obligatorios para nuevo empleado)
+                document.getElementById('nombreUsuarioGroup').style.display = 'block';
+                document.getElementById('passwordGroup').style.display = 'flex';
+
+                // Los campos de usuario y contraseña son requeridos para nuevo empleado
+                document.getElementById('nombre_usuario').setAttribute('required', 'required');
+                document.getElementById('password').setAttribute('required', 'required');
+
+                // Restablecer estado del botón
+                const btnGuardar = document.getElementById('btnGuardar');
+                if (btnGuardar) {
+                    btnGuardar.disabled = false;
+                    btnGuardar.innerText = "Guardar";
+                }
+
+                // Mostrar modal
+                modal.style.display = 'flex';
+            } catch (error) {
+                console.error("Error al preparar formulario de nuevo empleado:", error);
+                alert("Ocurrió un error al preparar el formulario. Por favor, inténtalo de nuevo.");
+            }
+        }
+    </script>
 </body>
 </html>
