@@ -36,6 +36,7 @@ def empleados():
         empleados = []
     return render_template('empleados.html', empleados=empleados)
 
+
 @app.route('/proveedores')
 def proveedores():
     try:
@@ -43,7 +44,7 @@ def proveedores():
         proveedores = response.json()
     except:
         proveedores = []
-    return render_template('proveedores.html', proveedores=proveedores)
+    return render_template('proveedores_pedidos.html', proveedores=proveedores)
 
 @app.route('/clientes')
 def clientes():
