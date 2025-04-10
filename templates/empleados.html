@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Empleados - Comics POS</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Empleados - Tienda de Cómics</title>
+    <!-- Axios para peticiones API -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
+        /* Estilos generales */
         * {
             margin: 0;
             padding: 0;
@@ -14,13 +17,11 @@
 
         body {
             background-color: #f5f5f5;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            color: #333;
         }
 
-        /* Navbar styles */
-        .navbar {
+        /* Estilos del encabezado */
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -34,8 +35,6 @@
             font-size: 24px;
             display: flex;
             align-items: center;
-            text-decoration: none;
-            color: black;
         }
 
         .logo::before {
@@ -48,33 +47,402 @@
             clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 70%, 0 100%);
         }
 
-        .nav-links {
+        nav ul {
             display: flex;
             list-style: none;
             gap: 30px;
         }
 
-        .nav-links li a {
+        nav ul li a {
             text-decoration: none;
             color: #333;
             font-weight: 500;
-            padding: 8px 0;
-            position: relative;
         }
 
-        .nav-links li a.active {
-            color: #e32929;
+        /* Contenedor principal */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        /* Estilos para la tabla de empleados */
+        .employees-table {
+            width: 100%;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .add-employee-btn {
+            background-color: #e32929;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+        }
+
+        .add-employee-btn:hover {
+            background-color: #c72020;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #f9f9f9;
             font-weight: 600;
         }
 
-        .nav-links li a.active::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            bottom: 0;
-            left: 0;
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Estilos para los avatares de empleados */
+        .employee-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             background-color: #e32929;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .employee-name {
+            font-weight: 600;
+        }
+
+        /* Estilos para los roles de empleados */
+        .role-tag {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .role-admin {
+            background-color: #4a6cf7;
+        }
+
+        .role-vendedor {
+            background-color: #38b653;
+        }
+
+        .role-almacen {
+            background-color: #e6a919;
+        }
+
+        /* Estilos para los estados de empleados */
+        .status-tag {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background-color: #e8f5e9;
+            color: #38b653;
+        }
+
+        .status-inactive {
+            background-color: #ffebee;
+            color: #e32929;
+        }
+
+        /* Botones de acción */
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .view-btn {
+            background-color: #e3f2fd;
+            color: #2196f3;
+        }
+
+        .edit-btn {
+            background-color: #fff3e0;
+            color: #ff9800;
+        }
+
+        .delete-btn {
+            background-color: #ffebee;
+            color: #f44336;
+        }
+
+        /* Paginación */
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            gap: 5px;
+        }
+
+        .pagination-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .pagination-btn.active {
+            background-color: #e32929;
+            color: white;
+            border-color: #e32929;
+        }
+
+        /* Estilos para modales */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Estilos para el modal de detalles */
+        .employee-details {
+            padding: 0;
+        }
+
+        .detail-item {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #f5f5f5;
+            padding-bottom: 15px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            width: 150px;
+            color: #666;
+        }
+
+        .detail-value {
+            flex: 1;
+        }
+
+        .avatar-large {
+            width: 80px;
+            height: 80px;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        /* Formularios */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: #e32929;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .required::after {
+            content: "*";
+            color: #e32929;
+            margin-left: 2px;
+        }
+
+        /* Filtros y búsqueda */
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            flex: 1;
+        }
+
+        .search-box {
+            display: flex;
+        }
+
+        .search-input {
+            flex: 1;
+            border-radius: 4px 0 0 4px;
+            border-right: none;
+        }
+
+        .search-btn {
+            background-color: #e32929;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        /* Mensajes de alerta */
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .alert-success {
+            background-color: #e8f5e9;
+            color: #388e3c;
+            border: 1px solid #c8e6c9;
+        }
+
+        .alert-error {
+            background-color: #ffebee;
+            color: #d32f2f;
+            border: 1px solid #ffcdd2;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            th, td {
+                min-width: 120px;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
         }
 
         .user-menu {
@@ -82,6 +450,13 @@
             display: flex;
             align-items: center;
             cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .user-menu:hover {
+            background-color: #f5f5f5;
         }
 
         .user-avatar {
@@ -104,498 +479,1159 @@
         .dropdown-icon {
             margin-left: 8px;
             font-size: 12px;
+            transition: transform 0.2s;
         }
 
-        /* Main content styles */
-        .main-content {
-            flex: 1;
-            padding: 30px;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
+        .user-menu:hover .dropdown-icon {
+            transform: rotate(180deg);
         }
 
-        .page-title {
-            font-size: 28px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .add-btn {
-            background-color: #e32929;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Search and filter section */
-        .filters-section {
+        /* Estilos para el contenido desplegable */
+        .dropdown-content {
+            position: absolute;
+            top: 100%;
+            right: 0;
             background-color: white;
-            padding: 20px;
+            min-width: 220px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
+            padding: 15px;
+            display: none;
+            z-index: 1000;
         }
 
-        .search-bar {
-            display: flex;
+        .user-menu:hover .dropdown-content {
+            display: block;
+        }
+
+        .user-info {
             margin-bottom: 15px;
         }
 
-        .search-input {
-            flex: 1;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px 0 0 5px;
+        .info-item {
+            padding: 5px 0;
             font-size: 14px;
-        }
-
-        .search-btn {
-            padding: 10px 20px;
-            background-color: #e32929;
-            color: white;
-            border: none;
-            border-radius: 0 5px 5px 0;
-            cursor: pointer;
-        }
-
-        .filter-options {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .filter-label {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .filter-select {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        /* Employees table */
-        .employees-table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-
-        .employees-table th {
-            background-color: #f5f5f5;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
             color: #333;
         }
 
-        .employees-table td {
-            padding: 15px;
-            border-top: 1px solid #eee;
+        .dropdown-divider {
+            height: 1px;
+            background-color: #eee;
+            margin: 10px 0;
         }
 
-        .employees-table tr:hover {
-            background-color: #f9f9f9;
-        }
-
-        .employee-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #f0f0f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #666;
-        }
-
-        .employee-name {
-            font-weight: 600;
-        }
-
-        .employee-role {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .role-admin {
-            background-color: #e3f2fd;
-            color: #1976d2;
-        }
-
-        .role-cashier {
-            background-color: #e8f5e9;
-            color: #388e3c;
-        }
-
-        .role-manager {
-            background-color: #fff8e1;
-            color: #ffa000;
-        }
-
-        .status-active {
-            color: #388e3c;
-        }
-
-        .status-inactive {
-            color: #d32f2f;
-        }
-
-        .action-btn {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            margin-right: 5px;
-        }
-
-        .edit-btn {
-            background-color: #f0f0f0;
-            color: #333;
-        }
-
-        .delete-btn {
-            background-color: #ffebee;
-            color: #d32f2f;
-        }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 30px;
-            gap: 5px;
-        }
-
-        .page-item {
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 5px;
-            cursor: pointer;
+        .dropdown-content a {
+            display: block;
+            padding: 8px 0;
+            text-decoration: none;
+            color: #e32929;
+            font-size: 14px;
             font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .dropdown-content a:hover {
+            opacity: 0.8;
+        }
+
+        /* Modificar el estilo del header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
             background-color: white;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .page-item.active {
-            background-color: #e32929;
-            color: white;
+        nav {
+            display: flex;
+            align-items: center;
         }
 
-        .page-item:hover:not(.active) {
-            background-color: #f0f0f0;
-        }
-
-        /* Mobile styles */
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        @media (max-width: 768px) {
-            .navbar {
-                padding: 15px;
-            }
-
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 70px;
-                left: 0;
-                right: 0;
-                background-color: white;
-                flex-direction: column;
-                padding: 20px;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-                z-index: 100;
-            }
-
-            .nav-links.active {
-                display: flex;
-            }
-
-            .mobile-menu-btn {
-                display: block;
-            }
-
-            .main-content {
-                padding: 15px;
-            }
-
-            .page-title {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-
-            .filter-options {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .employees-table {
-                display: block;
-                overflow-x: auto;
-            }
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            margin-right: 20px;
         }
     </style>
-</head>
-<body>
-    <!-- Navbar -->
-    <div class="navbar">
-        <a href="index.html" class="logo">COMICS</a>
-        
-        <button class="mobile-menu-btn">☰</button>
-        
+  </head>
+  <body>
+    <header>
+      <div class="logo">COMICS</div>
+      <nav>
         <ul class="nav-links">
-            <li><a href="{{ url_for('productos') }}">Productos</a></li>
-            <li><a href="{{ url_for('empleados') }}" class="active">Empleados</a></li>
-            <li><a href="{{ url_for('proveedores') }}">Proveedores</a></li>
-            <li><a href="{{ url_for('clientes') }}">Clientes</a></li>
+          <li><a href="/productos">Productos</a></li>
+          <li><a href="/empleados">Empleados</a></li>
+          <li><a href="/pedidos">Pedidos</a></li>
+          <li><a href="/proveedores">Proveedores</a></li>
+          <li><a href="/clientes">Clientes</a></li>
         </ul>
-        
-        
-        <div class="user-menu">
-            <div class="user-avatar">A</div>
-            <span class="user-name">Admin</span>
-            <span class="dropdown-icon">▼</span>
+
+        <!-- Perfil de usuario -->
+        <div class="user-menu" id="user-profile">
+          <div class="user-avatar" id="user-initials">A</div>
+          <span class="user-name" id="user-display-name">Admin</span>
+          <span class="dropdown-icon">▼</span>
+
+          <div class="dropdown-content">
+            <div class="user-info">
+              <div class="info-item" id="user-full-name">Nombre completo</div>
+              <div class="info-item" id="user-role">Rol: Administrador</div>
+              <div class="info-item" id="user-position">Puesto: Gerente</div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a href="#" onclick="logout()">Cerrar sesión</a>
+          </div>
         </div>
+      </nav>
+    </header>
+
+    <div class="container">
+      <!-- Área para mensajes de notificación -->
+      <div id="notification-area" style="display: none" class="alert">
+        <span id="notification-message"></span>
+      </div>
+
+      <div class="table-header">
+        <h2 class="section-title">Empleados</h2>
+        <button onclick="mostrarModalNuevo()" class="add-employee-btn">
+          + Añadir empleado
+        </button>
+      </div>
+
+      <div class="filters">
+        <div class="filter-group search-box">
+          <input
+            type="text"
+            placeholder="Buscar empleado..."
+            class="search-input"
+            id="searchInput"
+            name="search"
+          />
+          <button
+            type="button"
+            id="searchButton"
+            class="search-btn"
+            onclick="buscarEmpleados()"
+          >
+            🔍
+          </button>
+        </div>
+        <div class="filter-group">
+          <select
+            id="puestoFilter"
+            class="form-select"
+            onchange="buscarEmpleados()"
+          >
+            <option value="">Todos los puestos</option>
+            <!-- Los puestos se cargarán dinámicamente -->
+          </select>
+        </div>
+      </div>
+
+      <div class="employees-table">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Empleado</th>
+              <th>Email</th>
+              <th>Teléfono</th>
+              <th>Puesto</th>
+              <th>Estado</th>
+              <th>Usuario</th>
+              <th>Fecha contratación</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="employeesTableBody">
+            <tr>
+              <td colspan="9" class="text-center">Cargando empleados...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination" id="paginationContainer">
+        <!-- Paginación se generará dinámicamente -->
+      </div>
     </div>
 
-    <!-- Main content -->
-    <div class="main-content">
-        <div class="page-title">
-            <h1>Empleados</h1>
-            <button class="add-btn">+ Agregar Empleado</button>
+    <!-- Modal para confirmar eliminación -->
+    <div class="modal" id="deleteModal">
+      <div class="modal-content" style="max-width: 400px">
+        <div class="modal-header">
+          <h3 class="modal-title">Confirmar eliminación</h3>
+          <button class="close-modal" onclick="cerrarModal('deleteModal')">
+            ×
+          </button>
         </div>
+        <p style="margin-bottom: 20px">
+          ¿Está seguro de que desea eliminar este empleado? Esta acción no se
+          puede deshacer.
+        </p>
+        <div style="display: flex; gap: 10px; justify-content: flex-end">
+          <button
+            onclick="cerrarModal('deleteModal')"
+            class="btn btn-secondary"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onclick="eliminarEmpleado()"
+            class="btn btn-primary"
+            style="background-color: #f44336"
+          >
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
 
-        <div class="filters-section">
-            <div class="search-bar">
-                <input type="text" class="search-input" placeholder="Buscar empleados...">
-                <button class="search-btn">🔍</button>
+    <!-- Modal para ver detalles del empleado -->
+    <div class="modal" id="viewModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Detalles del Empleado</h3>
+          <button class="close-modal" onclick="cerrarModal('viewModal')">
+            ×
+          </button>
+        </div>
+        <div class="employee-details">
+          <div style="text-align: center; margin-bottom: 20px">
+            <div
+              class="employee-avatar avatar-large"
+              style="margin: 0 auto; display: flex"
+            >
+              <span id="viewInitials"></span>
             </div>
+            <h2 id="viewFullName" style="margin-top: 10px"></h2>
+          </div>
 
-            <div class="filter-options">
-                <div class="filter-group">
-                    <span class="filter-label">Rol:</span>
-                    <select class="filter-select">
-                        <option value="all">Todos</option>
-                        <option value="admin">Administrador</option>
-                        <option value="manager">Gerente</option>
-                        <option value="cashier">Cajero</option>
-                    </select>
-                </div>
+          <div class="detail-item">
+            <div class="detail-label">ID:</div>
+            <div class="detail-value" id="viewId"></div>
+          </div>
 
-                <div class="filter-group">
-                    <span class="filter-label">Estado:</span>
-                    <select class="filter-select">
-                        <option value="all">Todos</option>
-                        <option value="active">Activo</option>
-                        <option value="inactive">Inactivo</option>
-                    </select>
-                </div>
+          <div class="detail-item">
+            <div class="detail-label">Email:</div>
+            <div class="detail-value" id="viewEmail"></div>
+          </div>
+
+          <div class="detail-item">
+            <div class="detail-label">Teléfono:</div>
+            <div class="detail-value" id="viewTelefono"></div>
+          </div>
+
+          <div class="detail-item">
+            <div class="detail-label">Puesto:</div>
+            <div class="detail-value" id="viewPuesto"></div>
+          </div>
+
+          <div class="detail-item">
+            <div class="detail-label">Estado:</div>
+            <div class="detail-value" id="viewEstado"></div>
+          </div>
+
+          <div class="detail-item">
+            <div class="detail-label">Nombre de usuario:</div>
+            <div class="detail-value" id="viewNombreUsuario"></div>
+          </div>
+
+          <div class="detail-item">
+            <div class="detail-label">Fecha contratación:</div>
+            <div class="detail-value" id="viewFechaContratacion"></div>
+          </div>
+
+          <div class="detail-item">
+            <div class="detail-label">Fecha nacimiento:</div>
+            <div class="detail-value" id="viewFechaNacimiento"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="cerrarModal('viewModal')">
+            Cerrar
+          </button>
+          <button class="btn btn-primary" id="btnEditarDesdeDetalle">
+            Editar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para editar empleado -->
+    <div class="modal" id="editModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="editModalTitle">Editar Empleado</h3>
+          <button class="close-modal" onclick="cerrarModal('editModal')">
+            ×
+          </button>
+        </div>
+        <form
+          id="empleadoForm"
+          onsubmit="event.preventDefault(); guardarEmpleado();"
+        >
+          <input type="hidden" id="id_empleado" name="id_empleado" />
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nombre" class="required">Nombre</label>
+              <input type="text" id="nombre" name="nombre" required />
             </div>
-        </div>
+            <div class="form-group">
+              <label for="apellidos" class="required">Apellidos</label>
+              <input type="text" id="apellidos" name="apellidos" required />
+            </div>
+          </div>
 
-        <table class="employees-table">
-            <thead>
-                <tr>
-                    <th>Empleado</th>
-                    <th>Email</th>
-                    <th>Teléfono</th>
-                    <th>Rol</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div class="employee-avatar">JD</div>
-                            <span class="employee-name">Juan Pérez</span>
-                        </div>
-                    </td>
-                    <td>juan.perez@comics.com</td>
-                    <td>555-123-4567</td>
-                    <td><span class="employee-role role-admin">Administrador</span></td>
-                    <td><span class="status-active">Activo</span></td>
-                    <td>
-                        <button class="action-btn edit-btn">Editar</button>
-                        <button class="action-btn delete-btn">Eliminar</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div class="employee-avatar">ML</div>
-                            <span class="employee-name">María López</span>
-                        </div>
-                    </td>
-                    <td>maria.lopez@comics.com</td>
-                    <td>555-987-6543</td>
-                    <td><span class="employee-role role-cashier">Cajero</span></td>
-                    <td><span class="status-active">Activo</span></td>
-                    <td>
-                        <button class="action-btn edit-btn">Editar</button>
-                        <button class="action-btn delete-btn">Eliminar</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div class="employee-avatar">RG</div>
-                            <span class="employee-name">Roberto González</span>
-                        </div>
-                    </td>
-                    <td>roberto.gonzalez@comics.com</td>
-                    <td>555-456-7890</td>
-                    <td><span class="employee-role role-manager">Gerente</span></td>
-                    <td><span class="status-active">Activo</span></td>
-                    <td>
-                        <button class="action-btn edit-btn">Editar</button>
-                        <button class="action-btn delete-btn">Eliminar</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div class="employee-avatar">LR</div>
-                            <span class="employee-name">Laura Ramírez</span>
-                        </div>
-                    </td>
-                    <td>laura.ramirez@comics.com</td>
-                    <td>555-789-0123</td>
-                    <td><span class="employee-role role-cashier">Cajero</span></td>
-                    <td><span class="status-inactive">Inactivo</span></td>
-                    <td>
-                        <button class="action-btn edit-btn">Editar</button>
-                        <button class="action-btn delete-btn">Eliminar</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div class="employee-avatar">CM</div>
-                            <span class="employee-name">Carlos Mendoza</span>
-                        </div>
-                    </td>
-                    <td>carlos.mendoza@comics.com</td>
-                    <td>555-234-5678</td>
-                    <td><span class="employee-role role-cashier">Cajero</span></td>
-                    <td><span class="status-active">Activo</span></td>
-                    <td>
-                        <button class="action-btn edit-btn">Editar</button>
-                        <button class="action-btn delete-btn">Eliminar</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+          <div class="form-group">
+            <label for="email" class="required">Email</label>
+            <input type="email" id="email" name="email" required />
+          </div>
 
-        <div class="pagination">
-            <div class="page-item">«</div>
-            <div class="page-item active">1</div>
-            <div class="page-item">2</div>
-            <div class="page-item">3</div>
-            <div class="page-item">»</div>
-        </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="telefono">Teléfono</label>
+              <input type="tel" id="telefono" name="telefono" />
+            </div>
+            <div class="form-group">
+              <label for="id_puesto" class="required">Puesto</label>
+              <select id="id_puesto" name="id_puesto" required>
+                <!-- Las opciones se cargarán dinámicamente -->
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="id_status" class="required">Estado</label>
+              <select id="id_status" name="id_status" required>
+                <option value="1">Activo</option>
+                <option value="2">Inactivo</option>
+              </select>
+            </div>
+            <div class="form-group" id="nombreUsuarioGroup">
+              <label for="nombre_usuario" class="required"
+                >Nombre de usuario</label
+              >
+              <input type="text" id="nombre_usuario" name="nombre_usuario" />
+            </div>
+          </div>
+
+          <div class="form-row" id="passwordGroup">
+            <div class="form-group">
+              <label for="password" class="required">Contraseña</label>
+              <input type="password" id="password" name="password" />
+            </div>
+            <div class="form-group">
+              <label for="id_rol">Rol</label>
+              <select id="id_rol" name="id_rol">
+                <!-- Las opciones se cargarán dinámicamente -->
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fecha_contratacion">Fecha de contratación</label>
+              <input
+                type="date"
+                id="fecha_contratacion"
+                name="fecha_contratacion"
+              />
+            </div>
+            <div class="form-group">
+              <label for="fecha_nacimiento">Fecha de nacimiento</label>
+              <input
+                type="date"
+                id="fecha_nacimiento"
+                name="fecha_nacimiento"
+              />
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="cerrarModal('editModal')"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary" id="btnGuardar">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <script>
-        // Funcionalidad para el menú móvil
-        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
-            document.querySelector('.nav-links').classList.toggle('active');
-        });
+      // Variables globales
+      const API_URL = "http://127.0.0.1:8000"; // Ajustar según tu configuración
+      let currentPage = 1;
+      let itemsPerPage = 10;
+      let totalPages = 1;
+      let currentEmpleados = [];
+      let selectedEmpleadoId = null;
+      let puestosList = [];
+      let rolesList = [];
 
-        // Funcionalidad para la paginación
-        document.querySelectorAll('.page-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.page-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
+      // Función para obtener el token almacenado
+      function getStoredToken() {
+        // Intentar obtener de localStorage primero
+        let token = localStorage.getItem("authToken");
 
-        // Funcionalidad para los filtros
-        document.querySelectorAll('.filter-select').forEach(select => {
-            select.addEventListener('change', function() {
-                const role = document.querySelector('.filter-select:nth-child(1)').value;
-                const status = document.querySelector('.filter-select:nth-child(2)').value;
-                
-                console.log(`Filtros aplicados: Rol=${role}, Estado=${status}`);
-                // Aquí iría la lógica para filtrar los empleados
-            });
-        });
+        // Si no está en localStorage, intentar en sessionStorage
+        if (!token) {
+          token = sessionStorage.getItem("authToken");
+        }
 
-        // Funcionalidad para la búsqueda
-        document.querySelector('.search-btn').addEventListener('click', function() {
-            const searchTerm = document.querySelector('.search-input').value;
-            if (searchTerm) {
-                console.log(`Buscando: ${searchTerm}`);
-                // Aquí iría la lógica para buscar empleados
+        return token;
+      }
+
+      // Configuración de Axios con interceptores
+      function setupAxiosInterceptors() {
+        // Interceptor de peticiones
+        axios.interceptors.request.use(
+          (config) => {
+            const token = getStoredToken();
+            if (token) {
+              config.headers["Authorization"] = `Bearer ${token}`;
             }
-        });
+            return config;
+          },
+          (error) => {
+            console.error("Error en la petición:", error);
+            return Promise.reject(error);
+          }
+        );
 
-        // Permitir búsqueda con Enter
-        document.querySelector('.search-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.querySelector('.search-btn').click();
+        // Interceptor de respuestas
+        axios.interceptors.response.use(
+          (response) => {
+            return response;
+          },
+          (error) => {
+            if (error.response && error.response.status === 401) {
+              // Token expirado o inválido, redirigir al login
+              localStorage.removeItem("authToken");
+              sessionStorage.removeItem("authToken");
+              mostrarNotificacion(
+                "Sesión expirada. Por favor, inicia sesión nuevamente.",
+                "alert-error"
+              );
+              setTimeout(() => {
+                window.location.href = "/";
+              }, 2000);
             }
-        });
+            return Promise.reject(error);
+          }
+        );
+      }
 
-        // Funcionalidad para los botones de acción
-        document.querySelectorAll('.edit-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const row = this.closest('tr');
-                const employeeName = row.querySelector('.employee-name').textContent;
-                alert(`Editando empleado: ${employeeName}`);
+      // Función para mostrar notificaciones
+      function mostrarNotificacion(mensaje, tipo = "alert-success") {
+        const notificationArea = document.getElementById("notification-area");
+        const notificationMessage = document.getElementById(
+          "notification-message"
+        );
+
+        notificationArea.className = `alert ${tipo}`;
+        notificationMessage.textContent = mensaje;
+        notificationArea.style.display = "block";
+
+        // Ocultar después de 3 segundos
+        setTimeout(() => {
+          notificationArea.style.display = "none";
+        }, 3000);
+      }
+
+      // Función para cargar los empleados
+      async function cargarEmpleados() {
+        try {
+          const searchTerm = document
+            .getElementById("searchInput")
+            .value.trim();
+          const puestoFilter = document.getElementById("puestoFilter").value;
+
+          let url = `${API_URL}/empleados/?skip=${
+            (currentPage - 1) * itemsPerPage
+          }&limit=${itemsPerPage}`;
+
+          if (searchTerm) {
+            url += `&search=${encodeURIComponent(searchTerm)}`;
+          }
+
+          if (puestoFilter) {
+            url += `&puesto=${puestoFilter}`;
+          }
+
+          const response = await axios.get(url);
+          currentEmpleados = response.data;
+          renderizarEmpleados();
+
+          // Actualizar paginación (en una implementación real, obtendríamos el total de páginas de la API)
+          totalPages = Math.ceil(currentEmpleados.length / itemsPerPage) || 1;
+          actualizarPaginacion();
+        } catch (error) {
+          console.error("Error al cargar empleados:", error);
+          mostrarNotificacion(
+            "Error al cargar los empleados. " +
+              (error.response?.data?.detail || error.message),
+            "alert-error"
+          );
+        }
+      }
+
+      // Función para cargar los puestos
+      async function cargarPuestos() {
+        try {
+          const response = await axios.get(`${API_URL}/empleados/puestos`);
+          puestosList = response.data;
+
+          // Llenar el dropdown de filtro
+          const puestoFilter = document.getElementById("puestoFilter");
+          puestoFilter.innerHTML =
+            '<option value="">Todos los puestos</option>';
+
+          puestosList.forEach((puesto) => {
+            const option = document.createElement("option");
+            option.value = puesto.id_puesto;
+            option.textContent = puesto.nombre_puesto;
+            puestoFilter.appendChild(option);
+          });
+
+          // Llenar el dropdown del formulario
+          const idPuestoSelect = document.getElementById("id_puesto");
+          idPuestoSelect.innerHTML = "";
+
+          puestosList.forEach((puesto) => {
+            const option = document.createElement("option");
+            option.value = puesto.id_puesto;
+            option.textContent = puesto.nombre_puesto;
+            idPuestoSelect.appendChild(option);
+          });
+        } catch (error) {
+          console.error("Error al cargar puestos:", error);
+          mostrarNotificacion("Error al cargar los puestos.", "alert-error");
+        }
+      }
+
+      // Función para cargar los roles
+      async function cargarRoles() {
+        try {
+          const response = await axios.get(`${API_URL}/empleados/roles`);
+          rolesList = response.data;
+
+          // Llenar el dropdown del formulario
+          const idRolSelect = document.getElementById("id_rol");
+          idRolSelect.innerHTML = "";
+
+          rolesList.forEach((rol) => {
+            const option = document.createElement("option");
+            option.value = rol.id_rol;
+            option.textContent = rol.nombre_rol;
+            idRolSelect.appendChild(option);
+          });
+        } catch (error) {
+          console.error("Error al cargar roles:", error);
+          mostrarNotificacion("Error al cargar los roles.", "alert-error");
+        }
+      }
+
+      // Función para renderizar empleados en la tabla
+      function renderizarEmpleados() {
+        const tableBody = document.getElementById("employeesTableBody");
+        tableBody.innerHTML = "";
+
+        if (currentEmpleados.length === 0) {
+          tableBody.innerHTML =
+            '<tr><td colspan="9" class="text-center">No se encontraron empleados</td></tr>';
+          return;
+        }
+
+        currentEmpleados.forEach((empleado) => {
+          const row = document.createElement("tr");
+
+          // Obtener nombre del puesto
+          const puestoNombre =
+            puestosList.find((p) => p.id_puesto === empleado.id_puesto)
+              ?.nombre_puesto || "Desconocido";
+
+          // Formatear fechas
+          const fechaContratacion = empleado.fecha_contratacion
+            ? formatearFecha(empleado.fecha_contratacion)
+            : "No disponible";
+
+          // Iniciales para el avatar
+          const iniciales = `${empleado.nombre[0]}${
+            empleado.apellidos ? empleado.apellidos[0] : ""
+          }`;
+
+          row.innerHTML = `
+                <td>${empleado.id_empleado}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="employee-avatar">
+                            ${iniciales}
+                        </div>
+                        <span class="employee-name">${empleado.nombre} ${
+            empleado.apellidos || ""
+          }</span>
+                    </div>
+                </td>
+                <td>${empleado.email}</td>
+                <td>${empleado.telefono || "No disponible"}</td>
+                <td>${puestoNombre}</td>
+                <td>
+                    <span class="status-tag ${
+                      empleado.id_status === 1
+                        ? "status-active"
+                        : "status-inactive"
+                    }">
+                        ${empleado.id_status === 1 ? "Activo" : "Inactivo"}
+                    </span>
+                </td>
+                <td>${empleado.nombre_usuario || "No disponible"}</td>
+                <td>${fechaContratacion}</td>
+                <td>
+                    <button onclick="verEmpleado(${
+                      empleado.id_empleado
+                    })" class="action-btn view-btn">Ver</button>
+                    <button onclick="mostrarModalEditar(${
+                      empleado.id_empleado
+                    })" class="action-btn edit-btn">Editar</button>
+                    <button onclick="confirmarEliminar(${
+                      empleado.id_empleado
+                    })" class="action-btn delete-btn">Eliminar</button>
+                </td>
+            `;
+
+          tableBody.appendChild(row);
+        });
+      }
+
+      // Función para actualizar la paginación
+      function actualizarPaginacion() {
+        const paginationContainer = document.getElementById(
+          "paginationContainer"
+        );
+        paginationContainer.innerHTML = "";
+
+        // Botón anterior
+        const prevButton = document.createElement("button");
+        prevButton.className = "pagination-btn";
+        prevButton.textContent = "Anterior";
+        prevButton.disabled = currentPage === 1;
+        prevButton.addEventListener("click", () => {
+          if (currentPage > 1) {
+            currentPage--;
+            cargarEmpleados();
+          }
+        });
+        paginationContainer.appendChild(prevButton);
+
+        // Número de página actual
+        const pageSpan = document.createElement("span");
+        pageSpan.className = "pagination-btn active";
+        pageSpan.textContent = currentPage;
+        paginationContainer.appendChild(pageSpan);
+
+        // Botón siguiente
+        const nextButton = document.createElement("button");
+        nextButton.className = "pagination-btn";
+        nextButton.textContent = "Siguiente";
+        nextButton.disabled = currentPage >= totalPages;
+        nextButton.addEventListener("click", () => {
+          if (currentPage < totalPages) {
+            currentPage++;
+            cargarEmpleados();
+          }
+        });
+        paginationContainer.appendChild(nextButton);
+      }
+
+      // Función para formatear fecha
+      function formatearFecha(fechaString) {
+        if (!fechaString) return "No disponible";
+
+        try {
+          const fecha = new Date(fechaString);
+          return fecha.toLocaleDateString("es-ES", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          });
+        } catch (error) {
+          return fechaString;
+        }
+      }
+
+      // Función para ver los detalles de un empleado
+      async function verEmpleado(empleadoId) {
+        try {
+          const response = await axios.get(
+            `${API_URL}/empleados/${empleadoId}`
+          );
+          const empleado = response.data;
+
+          // Llenar los datos en el modal
+          document.getElementById("viewInitials").textContent =
+            empleado.nombre[0] +
+            (empleado.apellidos ? empleado.apellidos[0] : "");
+          document.getElementById("viewFullName").textContent =
+            empleado.nombre + " " + (empleado.apellidos || "");
+          document.getElementById("viewId").textContent = empleado.id_empleado;
+          document.getElementById("viewEmail").textContent = empleado.email;
+          document.getElementById("viewTelefono").textContent =
+            empleado.telefono || "No disponible";
+
+          // Buscar el nombre del puesto
+          const puestoNombre =
+            puestosList.find((p) => p.id_puesto === empleado.id_puesto)
+              ?.nombre_puesto || "Desconocido";
+          document.getElementById("viewPuesto").textContent = puestoNombre;
+
+          // Estado con formato
+          const estadoEl = document.getElementById("viewEstado");
+          estadoEl.textContent =
+            empleado.id_status === 1 ? "Activo" : "Inactivo";
+          estadoEl.className =
+            empleado.id_status === 1
+              ? "status-tag status-active"
+              : "status-tag status-inactive";
+
+          document.getElementById("viewNombreUsuario").textContent =
+            empleado.nombre_usuario || "No disponible";
+          document.getElementById("viewFechaContratacion").textContent =
+            empleado.fecha_contratacion
+              ? formatearFecha(empleado.fecha_contratacion)
+              : "No disponible";
+          document.getElementById("viewFechaNacimiento").textContent =
+            empleado.fecha_nacimiento
+              ? formatearFecha(empleado.fecha_nacimiento)
+              : "No disponible";
+
+          // Configurar botón para editar desde detalles
+          document.getElementById("btnEditarDesdeDetalle").onclick =
+            function () {
+              cerrarModal("viewModal");
+              mostrarModalEditar(empleado.id_empleado);
+            };
+
+          // Mostrar modal
+          document.getElementById("viewModal").style.display = "flex";
+        } catch (error) {
+          console.error("Error al cargar detalles del empleado:", error);
+          mostrarNotificacion(
+            "Error al cargar los detalles del empleado. " +
+              (error.response?.data?.detail || error.message),
+            "alert-error"
+          );
+        }
+      }
+
+      // Función para mostrar el modal de nuevo empleado
+      function mostrarModalNuevo() {
+        const form = document.getElementById("empleadoForm");
+        form.reset();
+        document.getElementById("id_empleado").value = "";
+        document.getElementById("editModalTitle").textContent =
+          "Nuevo Empleado";
+
+        // Mostrar campos de usuario y contraseña
+        document.getElementById("nombreUsuarioGroup").style.display = "block";
+        document.getElementById("passwordGroup").style.display = "flex";
+
+        // Establecer valores predeterminados
+        document.getElementById("id_status").value = "1"; // Activo por defecto
+
+        // Restablecer validaciones
+        const nombreUsuarioInput = document.getElementById("nombre_usuario");
+        const passwordInput = document.getElementById("password");
+
+        nombreUsuarioInput.setAttribute("required", "required");
+        passwordInput.setAttribute("required", "required");
+
+        document.getElementById("editModal").style.display = "flex";
+      }
+
+      // Función para mostrar el modal de edición
+      async function mostrarModalEditar(empleadoId) {
+        try {
+          const response = await axios.get(
+            `${API_URL}/empleados/${empleadoId}`
+          );
+          const empleado = response.data;
+
+          const form = document.getElementById("empleadoForm");
+          form.reset();
+
+          document.getElementById("editModalTitle").textContent =
+            "Editar Empleado";
+          document.getElementById("id_empleado").value = empleado.id_empleado;
+          document.getElementById("nombre").value = empleado.nombre;
+          document.getElementById("apellidos").value = empleado.apellidos || "";
+          document.getElementById("email").value = empleado.email;
+          document.getElementById("telefono").value = empleado.telefono || "";
+          document.getElementById("id_puesto").value = empleado.id_puesto;
+          document.getElementById("id_status").value = empleado.id_status;
+
+          // Ocultar campos de usuario y contraseña
+          document.getElementById("nombreUsuarioGroup").style.display = "none";
+          document.getElementById("passwordGroup").style.display = "none";
+
+          // Quitar requisito de password para edición
+          const nombreUsuarioInput = document.getElementById("nombre_usuario");
+          const passwordInput = document.getElementById("password");
+
+          nombreUsuarioInput.removeAttribute("required");
+          passwordInput.removeAttribute("required");
+
+          // Formatear fechas para los inputs
+          if (empleado.fecha_contratacion) {
+            try {
+              const fecha = new Date(empleado.fecha_contratacion);
+              const fechaFormateada = fecha.toISOString().split("T")[0];
+              document.getElementById("fecha_contratacion").value =
+                fechaFormateada;
+            } catch (e) {
+              console.error("Error al formatear fecha_contratacion:", e);
+            }
+          }
+
+          if (empleado.fecha_nacimiento) {
+            try {
+              const fecha = new Date(empleado.fecha_nacimiento);
+              const fechaFormateada = fecha.toISOString().split("T")[0];
+              document.getElementById("fecha_nacimiento").value =
+                fechaFormateada;
+            } catch (e) {
+              console.error("Error al formatear fecha_nacimiento:", e);
+            }
+          }
+
+          document.getElementById("editModal").style.display = "flex";
+        } catch (error) {
+          console.error("Error al cargar datos del empleado:", error);
+          mostrarNotificacion(
+            "Error al cargar los datos del empleado. " +
+              (error.response?.data?.detail || error.message),
+            "alert-error"
+          );
+        }
+      }
+
+      // Función para guardar un empleado (nuevo o editado)
+      async function guardarEmpleado() {
+        try {
+          const form = document.getElementById("empleadoForm");
+          const formData = new FormData(form);
+          const empleadoId = formData.get("id_empleado");
+          const isNew = !empleadoId;
+
+          // Validar campos requeridos
+          if (!validarCamposEmpleado(isNew)) {
+            return;
+          }
+
+          // Preparar datos
+          const empleadoData = {
+            nombre: formData.get("nombre"),
+            apellidos: formData.get("apellidos"),
+            email: formData.get("email"),
+            telefono: formData.get("telefono") || null,
+            id_puesto: parseInt(formData.get("id_puesto")),
+            id_status: parseInt(formData.get("id_status")),
+            fecha_contratacion: formData.get("fecha_contratacion") || null,
+            fecha_nacimiento: formData.get("fecha_nacimiento") || null,
+          };
+
+          // Añadir campos adicionales para nuevo empleado
+          if (isNew) {
+            empleadoData.nombre_usuario = formData.get("nombre_usuario");
+            empleadoData.password = formData.get("password");
+            empleadoData.id_rol = formData.get("id_rol")
+              ? parseInt(formData.get("id_rol"))
+              : 2; // 2 sería un rol no-admin por defecto
+          }
+
+          // Deshabilitar botón para evitar doble envío
+          const btnGuardar = document.getElementById("btnGuardar");
+          btnGuardar.disabled = true;
+          btnGuardar.textContent = "Guardando...";
+
+          let response;
+
+          if (isNew) {
+            // Crear nuevo empleado
+            response = await axios.post(`${API_URL}/empleados/`, empleadoData);
+            mostrarNotificacion(
+              "Empleado creado correctamente.",
+              "alert-success"
+            );
+          } else {
+            // Actualizar empleado existente
+            response = await axios.put(
+              `${API_URL}/empleados/${empleadoId}`,
+              empleadoData
+            );
+            mostrarNotificacion(
+              "Empleado actualizado correctamente.",
+              "alert-success"
+            );
+          }
+
+          // Cerrar modal y recargar datos
+          cerrarModal("editModal");
+          cargarEmpleados();
+        } catch (error) {
+          console.error("Error al guardar empleado:", error);
+
+          // Extraer mensaje de error específico si existe
+          let mensajeError = "Error al guardar el empleado.";
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.detail
+          ) {
+            mensajeError += " " + error.response.data.detail;
+          }
+
+          mostrarNotificacion(mensajeError, "alert-error");
+
+          // Restablecer botón
+          const btnGuardar = document.getElementById("btnGuardar");
+          btnGuardar.disabled = false;
+          btnGuardar.textContent = "Guardar";
+        }
+      }
+
+      // Función para validar campos del formulario
+      function validarCamposEmpleado(isNew) {
+        // Campos básicos obligatorios
+        const nombre = document.getElementById("nombre").value.trim();
+        const apellidos = document.getElementById("apellidos").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const idPuesto = document.getElementById("id_puesto").value;
+
+        if (!nombre || !apellidos || !email || !idPuesto) {
+          mostrarNotificacion(
+            "Por favor completa todos los campos obligatorios.",
+            "alert-error"
+          );
+          return false;
+        }
+
+        // Campos adicionales para nuevo empleado
+        if (isNew) {
+          const nombreUsuario = document
+            .getElementById("nombre_usuario")
+            .value.trim();
+          const password = document.getElementById("password").value;
+
+          if (!nombreUsuario || !password) {
+            mostrarNotificacion(
+              "El nombre de usuario y contraseña son obligatorios para nuevos empleados.",
+              "alert-error"
+            );
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      // Función para confirmar eliminación
+      function confirmarEliminar(empleadoId) {
+        selectedEmpleadoId = empleadoId;
+        document.getElementById("deleteModal").style.display = "flex";
+      }
+
+      // Función para eliminar un empleado
+      async function eliminarEmpleado() {
+        if (!selectedEmpleadoId) return;
+
+        try {
+          await axios.delete(`${API_URL}/empleados/${selectedEmpleadoId}`);
+          mostrarNotificacion(
+            "Empleado eliminado correctamente.",
+            "alert-success"
+          );
+          cerrarModal("deleteModal");
+          cargarEmpleados();
+        } catch (error) {
+          console.error("Error al eliminar empleado:", error);
+          let mensajeError = "Error al eliminar el empleado.";
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.detail
+          ) {
+            mensajeError += " " + error.response.data.detail;
+          }
+          mostrarNotificacion(mensajeError, "alert-error");
+        }
+      }
+
+      // Función para buscar empleados
+      function buscarEmpleados() {
+        currentPage = 1;
+        cargarEmpleados();
+      }
+
+      // Función para cerrar modales
+      function cerrarModal(modalId) {
+        document.getElementById(modalId).style.display = "none";
+      }
+
+      // Cerrar modales al hacer clic fuera
+      window.onclick = function (event) {
+        const modales = document.getElementsByClassName("modal");
+        for (let i = 0; i < modales.length; i++) {
+          if (event.target === modales[i]) {
+            modales[i].style.display = "none";
+          }
+        }
+      };
+
+      // Función para cargar el perfil del usuario
+      function loadUserProfile() {
+        // Intentar obtener los datos del usuario de localStorage o sessionStorage
+        let userData =
+          JSON.parse(localStorage.getItem("userData")) ||
+          JSON.parse(sessionStorage.getItem("userData"));
+
+        if (!userData) {
+          console.warn("No se encontraron datos de usuario");
+          return;
+        }
+
+        // Actualizar el nombre en la barra de navegación
+        const displayNameElement = document.getElementById("user-display-name");
+        if (displayNameElement) {
+          displayNameElement.textContent = userData.nombre || "Usuario";
+        }
+
+        // Actualizar las iniciales en el avatar
+        const initialsElement = document.getElementById("user-initials");
+        if (initialsElement) {
+          const initials = getInitials(userData.nombre);
+          initialsElement.textContent = initials;
+        }
+
+        // Actualizar información en el menú desplegable
+        const fullNameElement = document.getElementById("user-full-name");
+        if (fullNameElement) {
+          fullNameElement.textContent = `${userData.nombre} ${
+            userData.apellidos || ""
+          }`;
+        }
+
+        const roleElement = document.getElementById("user-role");
+        if (roleElement) {
+          const roles = {
+            1: "Administrador",
+            2: "Vendedor",
+            3: "Almacén",
+            4: "Gerente",
+          };
+          roleElement.textContent = `Rol: ${
+            roles[userData.id_rol] || "Empleado"
+          }`;
+        }
+
+        const positionElement = document.getElementById("user-position");
+        if (positionElement) {
+          positionElement.textContent = `Puesto: ${
+            userData.puesto || "Sin especificar"
+          }`;
+        }
+      }
+
+      // Función para obtener las iniciales de un nombre
+      function getInitials(name) {
+        if (!name) return "U";
+
+        const parts = name.split(" ");
+        if (parts.length === 1) {
+          return parts[0].charAt(0).toUpperCase();
+        }
+
+        return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+      }
+
+      // Función para cerrar sesión
+      function logout() {
+        // Eliminar tokens y datos de usuario
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("userData");
+        sessionStorage.removeItem("authToken");
+        sessionStorage.removeItem("userData");
+
+        // Redirigir al login
+        window.location.href = "/";
+      }
+
+      // Verificar autenticación
+      function verificarAutenticacion() {
+        const token = getStoredToken();
+        if (!token) {
+          mostrarNotificacion(
+            "No has iniciado sesión. Serás redirigido a la página de login.",
+            "alert-error"
+          );
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 2000);
+          return false;
+        }
+        return true;
+      }
+
+      // Función de inicialización
+      async function inicializar() {
+        // Configurar interceptores Axios
+        setupAxiosInterceptors();
+
+        // Verificar autenticación
+        if (!verificarAutenticacion()) return;
+
+        try {
+          // Cargar datos del usuario
+          loadUserProfile();
+
+          // Cargar puestos y roles
+          await cargarPuestos();
+          await cargarRoles();
+
+          // Cargar empleados
+          await cargarEmpleados();
+
+          // Configurar eventos
+          document
+            .getElementById("searchInput")
+            .addEventListener("keypress", function (e) {
+              if (e.key === "Enter") {
+                buscarEmpleados();
+              }
             });
-        });
+        } catch (error) {
+          console.error("Error durante la inicialización:", error);
+          mostrarNotificacion(
+            "Error al cargar los datos iniciales.",
+            "alert-error"
+          );
+        }
+      }
 
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const row = this.closest('tr');
-                const employeeName = row.querySelector('.employee-name').textContent;
-                if (confirm(`¿Está seguro que desea eliminar al empleado ${employeeName}?`)) {
-                    row.remove();
-                }
-            });
-        });
-
-        // Funcionalidad para agregar empleado
-        document.querySelector('.add-btn').addEventListener('click', function() {
-            alert('Abriendo formulario para agregar nuevo empleado');
-        });
+      // Ejecutar al cargar la página
+      document.addEventListener("DOMContentLoaded", inicializar);
     </script>
-</body>
+  </body>
 </html>
