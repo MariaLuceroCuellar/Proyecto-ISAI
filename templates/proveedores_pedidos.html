@@ -140,7 +140,7 @@
         border-radius: 4px;
         transition: background-color 0.2s;
       }
-      
+
       .logo {
         font-weight: 900;
         font-size: 24px;
@@ -161,35 +161,34 @@
   </head>
   <body class="bg-gray-100 min-h-screen flex flex-col">
     <header>
-        <div class="logo">COMICS</div>
-        <nav>
-          <ul class="nav-links">
-            <li><a href="{{ url_for('productos') }}">Productos</a></li>
-            <li><a href="{{ url_for('empleados') }}">Empleados</a></li>
-            <li><a href="{{ url_for('pedidos') }}">Pedidos</a></li>
-            <li><a href="{{ url_for('proveedores') }}">Proveedores</a></li>
-            <li><a href="{{ url_for('clientes') }}">Clientes</a></li>
-          </ul>
-          
-          <!-- Perfil de usuario fuera del ul pero dentro de nav -->
-          <div class="user-menu" id="user-profile">
-            <div class="user-avatar" id="user-initials">A</div>
-            <span class="user-name" id="user-display-name">Admin</span>
-            <span class="dropdown-icon">▼</span>
-            
-            <div class="dropdown-content">
-              <div class="user-info">
-                <div class="info-item" id="user-full-name">Nombre completo</div>
-                <div class="info-item" id="user-role">Rol: Administrador</div>
-                <div class="info-item" id="user-position">Puesto: Gerente</div>
-              </div>
-              <div class="dropdown-divider"></div>
-              <a href="#" onclick="logout()">Cerrar sesión</a>
+      <div class="logo">COMICS</div>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="{{ url_for('productos') }}">Productos</a></li>
+          <li><a href="{{ url_for('empleados') }}">Empleados</a></li>
+          <li><a href="{{ url_for('pedidos') }}">Pedidos</a></li>
+          <li><a href="{{ url_for('proveedores') }}">Proveedores</a></li>
+          <li><a href="{{ url_for('clientes') }}">Clientes</a></li>
+        </ul>
+
+        <!-- Perfil de usuario fuera del ul pero dentro de nav -->
+        <div class="user-menu" id="user-profile">
+          <div class="user-avatar" id="user-initials">A</div>
+          <span class="user-name" id="user-display-name">Admin</span>
+          <span class="dropdown-icon">▼</span>
+
+          <div class="dropdown-content">
+            <div class="user-info">
+              <div class="info-item" id="user-full-name">Nombre completo</div>
+              <div class="info-item" id="user-role">Rol: Administrador</div>
+              <div class="info-item" id="user-position">Puesto: Gerente</div>
             </div>
+            <div class="dropdown-divider"></div>
+            <a href="#" onclick="logout()">Cerrar sesión</a>
           </div>
-        </nav>
-      </header>
-      
+        </div>
+      </nav>
+    </header>
 
     <!-- Main content -->
     <div class="flex-1 p-6 max-w-7xl mx-auto w-full">
@@ -1371,33 +1370,85 @@
         }
       });
 
-      // Load providers from API
+      // Load providers from API con filtros funcionando
       async function loadProviders() {
-        console.log("Iniciando carga de proveedores...");
+        console.log("Iniciando carga de proveedores con filtros...");
+
+        // Obtener valores de los filtros
+        const searchText = searchInput.value.trim().toLowerCase();
+        const categoryValue = categoryFilter.value;
+        const statusValue = statusFilter.value;
+
+        console.log("Filtros aplicados:", {
+          searchText,
+          categoryValue,
+          statusValue,
+        });
 
         try {
-          // Agregar filtro por estado activo
-          const response = await axios.get("/proveedores/?id_status=1");
+          // Construir URL con parámetros
+          let url = "/proveedores/";
+          let params = [];
+
+          // Añadir filtro de estado si no es "all"
+          if (statusValue !== "all") {
+            params.push(`id_status=${statusValue}`);
+          }
+
+          // Construir URL con parámetros
+          if (params.length > 0) {
+            url += "?" + params.join("&");
+          }
+
+          console.log("Solicitando URL:", url);
+          const response = await axios.get(url);
           console.log("✅ Proveedores cargados correctamente:", response.data);
-          currentProviders = response.data;
+
+          // Guardar todos los proveedores de la API
+          let providers = response.data;
+
+          // Aplicar filtrado del lado del cliente
+          providers = applyFilters(
+            providers,
+            searchText,
+            categoryValue,
+            statusValue
+          );
+
+          console.log("Proveedores después de filtrado:", providers.length);
+          currentProviders = providers;
           renderProviders();
-          return response.data;
+          return providers;
         } catch (error) {
           console.error("❌ Error cargando proveedores:", error);
 
-          // Si tu API no soporta el filtrado por query params, puedes hacerlo manualmente
+          // Intentar sin parámetros y filtrar del lado del cliente
           try {
             const response = await axios.get("/proveedores/");
-            currentProviders = response.data.filter(
-              (provider) => provider.id_status === 1
+            let providers = response.data;
+
+            // Aplicar todos los filtros del lado del cliente
+            providers = applyFilters(
+              providers,
+              searchText,
+              categoryValue,
+              statusValue
             );
+
+            currentProviders = providers;
             renderProviders();
-            return currentProviders;
+            return providers;
           } catch {
-            // Si fallan ambos intentos, usa datos de muestra filtrados
-            currentProviders = getMockProviders().filter(
-              (p) => p.id_status === 1
+            // Si ambos intentos fallan, usar datos de muestra con filtros
+            let mockProviders = getMockProviders();
+            mockProviders = applyFilters(
+              mockProviders,
+              searchText,
+              categoryValue,
+              statusValue
             );
+
+            currentProviders = mockProviders;
             renderProviders();
             showNotification(
               "Error al cargar proveedores. Usando datos de muestra.",
@@ -1407,6 +1458,34 @@
 
           throw error;
         }
+      }
+
+      // Función auxiliar para aplicar todos los filtros del lado del cliente
+      function applyFilters(providers, searchText, categoryValue, statusValue) {
+        return providers.filter((provider) => {
+          // Aplicar filtro de búsqueda
+          const matchesSearch =
+            searchText === "" ||
+            provider.nombre.toLowerCase().includes(searchText) ||
+            (provider.email &&
+              provider.email.toLowerCase().includes(searchText)) ||
+            (provider.telefono && provider.telefono.includes(searchText)) ||
+            (provider.notas &&
+              provider.notas.toLowerCase().includes(searchText));
+
+          // Aplicar filtro de categoría
+          const category = getCategoryByName(provider.nombre).toLowerCase();
+          const matchesCategory =
+            categoryValue === "all" || categoryValue === category;
+
+          // Aplicar filtro de estado (si no se aplicó en la API)
+          const matchesStatus =
+            statusValue === "all" ||
+            provider.id_status.toString() === statusValue;
+
+          // El elemento pasa el filtro si cumple todas las condiciones
+          return matchesSearch && matchesCategory && matchesStatus;
+        });
       }
 
       // Render providers in the grid
