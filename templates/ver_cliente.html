@@ -219,74 +219,56 @@
     <div class="navbar">
         <a href="index.html" class="logo">COMICS</a>
         
-        <button class="mobile-menu-btn">☰</button>
-        
         <ul class="nav-links">
             <li><a href="{{ url_for('productos') }}">Productos</a></li>
             <li><a href="{{ url_for('empleados') }}">Empleados</a></li>
             <li><a href="{{ url_for('proveedores') }}">Proveedores</a></li>
             <li><a href="{{ url_for('clientes') }}">Clientes</a></li>
-            <li><a href="{{ url_for('inventario') }}" class="active">Inventario</a></li>
         </ul>
     </div>
 
-    <div class="main-content">
-        <div class="page-title">
-            <h1>Inventario</h1>
-            <button class="add-btn">+ Agregar Movimiento</button>
-        </div>
+    <<div class="main-content">
+        <h2 class="page-title">Detalles del Cliente</h2>
 
-        <div class="filters-section">
-            <div class="search-bar">
-                <input type="text" class="search-input" placeholder="Buscar movimientos...">
-                <button class="search-btn">🔍</button>
-            </div>
-        </div>
-
-        <div class="table-container">
+        <div class="client-details">
             <table>
-                <thead>
-                    <tr>
-                        <th>ID Movimiento</th>
-                        <th>Producto</th>
-                        <th>Tipo Movimiento</th>
-                        <th>Cantidad</th>
-                        <th>Stock Anterior</th>
-                        <th>Stock Nuevo</th>
-                        <th>Empleado</th>
-                        <th>Fecha Movimiento</th>
-                        <th>Motivo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if inventarios %}
-                        {% for movimiento in inventarios %}
-                            <tr>
-                                <td>{{ movimiento.id_movimiento }}</td>
-                                <td>{{ movimiento.id_producto }}</td>
-                                <td>{{ movimiento.id_tipo_movimiento }}</td>
-                                <td>{{ movimiento.cantidad }}</td>
-                                <td>{{ movimiento.stock_anterior }}</td>
-                                <td>{{ movimiento.stock_nuevo }}</td>
-                                <td>{{ movimiento.id_empleado }}</td>
-                                <td>{{ movimiento.fecha_movimiento }}</td>
-                                <td>{{ movimiento.motivo }}</td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr><td colspan="9">No hay datos de inventario.</td></tr>
-                    {% endif %}
-                </tbody>
+                <tr>
+                    <th>Nombre</th>
+                    <td>{{ cliente.nombre }} {{ cliente.apellidos }}</td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td>{{ cliente.email }}</td>
+                </tr>
+                <tr>
+                    <th>Teléfono</th>
+                    <td>{{ cliente.telefono }}</td>
+                </tr>
+                <tr>
+                    <th>Fecha de Registro</th>
+                    <td>{{ cliente.fecha_registro }}</td>
+                </tr>
+                <tr>
+                    <th>Fecha de Última Compra</th>
+                    <td>{{ cliente.fecha_ultima_compra }}</td>
+                </tr>
+                <tr>
+                    <th>Puntos Acumulados</th>
+                    <td>{{ cliente.puntos_acumulados }}</td>
+                </tr>
+                <tr>
+                    <th>ID Nivel</th>
+                    <td>{{ cliente.id_nivel }}</td>
+                </tr>
+                <tr>
+                    <th>ID Estatus</th>
+                    <td>{{ cliente.id_status }}</td>
+                </tr>
             </table>
-                      
         </div>
 
-        <div class="pagination">
-            <div class="page-item">«</div>
-            <div class="page-item active">1</div>
-            <div class="page-item">2</div>
-            <div class="page-item">3</div>
-            <div class="page-item">»</div>
+        <div class="page-title">
+            <button class="add-btn" onclick="window.location.href='/clientes';" style="margin-top: 90px;">Regresa a la lista de clientes</button>
         </div>
     </div>
 
